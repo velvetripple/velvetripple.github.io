@@ -1,0 +1,200 @@
+/* ============================================================
+   VELVET RIPPLE — Color & Type Foundations
+   VR — 001 · Liquid Velvet Movement · MMXXVI
+   ------------------------------------------------------------
+   One font per role. One mark per page. One signature per post.
+   Reserve bone + inkwell for ~70% of any composition.
+   Saturated colors are spice, not the meal.
+   ============================================================ */
+
+/* ---------- FONTS ---------- */
+@font-face {
+  font-family: "Gloock";
+  src: url("fonts/Gloock-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Boldonse";
+  src: url("fonts/Boldonse-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("fonts/InstrumentSans-VariableFont_wdth,wght.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Instrument Sans";
+  src: url("fonts/InstrumentSans-Italic-VariableFont_wdth,wght.ttf") format("truetype");
+  font-weight: 400 700;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("fonts/GeistMono-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("fonts/GeistMono-Italic-VariableFont_wght.ttf") format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  /* ============================================================
+     COLOR — THE SYSTEM
+     Each hue carries the temperature of a remembered hour.
+     Use as climate, not decoration.
+     ============================================================ */
+
+  /* — Signature reds — */
+  --vr-oxblood:     #6B1E1A; /* Signature. The velvet. Use as anchor.        */
+  --vr-claret:      #8B2A2B; /* Secondary red. Aging wine. Subordinate.       */
+
+  /* — Warm light — */
+  --vr-burnt-amber: #C46B1F; /* Golden-hour heat. Sparingly, never large.     */
+  --vr-honey:       #D9A24B; /* Warm light point. Highlights, marks, sun.     */
+
+  /* — Cool counterweights — */
+  --vr-moss:        #3A4A2E; /* Forest deep. Cold counterweight to amber.     */
+  --vr-pond-teal:   #2B4549; /* Water, reflection. Behind type, under image.  */
+  --vr-dusk:        #6F5C73; /* Rare lilac. One per release maximum.          */
+
+  /* — Grounds — */
+  --vr-bone:        #EFE7D6; /* Paper ground. The breathing field.            */
+  --vr-inkwell:     #161311; /* Near-black. Type, structure, depth.           */
+
+  /* ---------- SEMANTIC SURFACES ---------- */
+  --bg:             var(--vr-bone);      /* default page ground               */
+  --bg-deep:        var(--vr-inkwell);   /* inverted / night ground           */
+  --bg-teal:        var(--vr-pond-teal); /* behind-type panel                 */
+  --surface:        #F4EEE1;             /* card lift on bone (warmer paper)   */
+  --surface-ink:    #1E1A17;            /* card lift on inkwell               */
+
+  /* ---------- SEMANTIC FOREGROUNDS ---------- */
+  --fg1:            var(--vr-inkwell);                /* primary text on bone   */
+  --fg2:            rgba(22, 19, 17, 0.62);           /* secondary / muted      */
+  --fg3:            rgba(22, 19, 17, 0.40);           /* faint / catalog marks  */
+  --fg-on-deep1:    var(--vr-bone);                   /* primary text on ink    */
+  --fg-on-deep2:    rgba(239, 231, 214, 0.60);        /* secondary on ink       */
+  --fg-on-deep3:    rgba(239, 231, 214, 0.34);        /* faint on ink           */
+
+  --accent:         var(--vr-oxblood);   /* anchor accent                     */
+  --accent-warm:    var(--vr-honey);     /* highlight / sun                   */
+
+  /* ---------- HAIRLINES ---------- */
+  --rule:           rgba(22, 19, 17, 0.18);   /* divider on bone              */
+  --rule-strong:    rgba(22, 19, 17, 0.42);
+  --rule-on-deep:   rgba(239, 231, 214, 0.20);
+
+  /* ============================================================
+     TYPE — base families (one font per role, never deviate)
+     ============================================================ */
+  --font-display: "Gloock", "Cardo", "EB Garamond", Georgia, serif;   /* titles, song names, wordmark */
+  --font-stamp:   "Boldonse", "Gloock", serif;                        /* stamps, emblems, ≤4 words    */
+  --font-body:    "Instrument Sans", "Inter", system-ui, sans-serif;  /* captions, liner notes, copy  */
+  --font-mono:    "Geist Mono", "IBM Plex Mono", ui-monospace, monospace; /* catalog, BPM, dates      */
+
+  /* ---------- TYPE TOKENS (the artifact voice) ---------- */
+  /* Display — Gloock, never bold, confident tracking */
+  --wordmark-tracking: 0.34em;  /* linear wordmark +280            */
+  --display-tracking:  0.012em;
+
+  /* Fluid display sizes tuned for screen (brandbook is print-pt) */
+  --fs-wordmark: clamp(2.4rem, 7vw, 5.5rem);  /* @kind font */
+  --fs-title:    clamp(2rem, 5vw, 3.4rem);    /* @kind font */
+  --fs-h1:       clamp(1.7rem, 3.6vw, 2.6rem); /* @kind font */
+  --fs-h2:       clamp(1.3rem, 2.4vw, 1.75rem); /* @kind font */
+  --fs-subtitle: 1rem;     /* Gloock italic ~16pt */
+  --fs-tracklist:0.95rem;  /* Gloock ~14pt */
+  --fs-body:     0.95rem;  /* Instrument Sans 9–10pt feel, generous leading */
+  --fs-caption:  0.82rem;
+  --fs-mono:     0.7rem;   /* Geist Mono 7pt — catalog marks */
+
+  --lh-display:  1.04;     /* @kind font */
+  --lh-body:     1.7;      /* @kind font */
+}
+
+/* ============================================================
+   SEMANTIC ELEMENT STYLES
+   Mix into any page for the house voice. Bone ground assumed.
+   ============================================================ */
+
+.vr-wordmark {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: var(--wordmark-tracking);
+  text-transform: uppercase;
+  line-height: 1.1;
+  color: var(--fg1);
+}
+.vr-stamp {
+  font-family: var(--font-stamp);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+.vr-title, .vr-h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: var(--display-tracking);
+  line-height: var(--lh-display);
+  color: var(--fg1);
+}
+.vr-title { font-size: var(--fs-title); }
+.vr-h1    { font-size: var(--fs-h1); }
+.vr-h2 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--fs-h2);
+  line-height: 1.12;
+  color: var(--fg1);
+}
+.vr-subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--fs-subtitle);
+  color: var(--fg2);
+  letter-spacing: 0.01em;
+}
+.vr-tracklist {
+  font-family: var(--font-display);
+  font-size: var(--fs-tracklist);
+  letter-spacing: 0.02em;
+  color: var(--fg1);
+}
+.vr-body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--fg1);
+}
+.vr-caption {
+  font-family: var(--font-body);
+  font-size: var(--fs-caption);
+  line-height: 1.55;
+  color: var(--fg2);
+}
+.vr-mono, .vr-catalog {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--fs-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--fg3);
+}
+
+/* The catalog mark — signs every page, print, post */
+.vr-catalog::before { content: ""; }
