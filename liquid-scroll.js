@@ -1,99 +1,154 @@
 /* ============================================================
-   VELVET RIPPLE — liquid scroll engine
+   VELVET RIPPLE — liquid scroll engine · v4 (fluid)
    calm at rest · liquefies with scroll velocity · climate descent
+
+   perf contract:
+   · geometry is MEASURED ONCE (load/resize) — the frame loop reads
+     only window.scrollY, so it never forces a layout.
+   · the loop SHUTS OFF when settled and restarts on scroll — at rest
+     the page costs literally zero.
+   · the SVG melt filter drives THREE small type blocks only. photos
+     move on transforms (compositor) — never re-rasterized.
+   · every write is deduped against its last value.
    listens for `vr-tweaks` CustomEvents from the Tweaks panel
    ============================================================ */
 (() => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // defaults — kept in sync with site-tweaks.jsx / site-tweaks-v2.jsx
-  // v2 analog knobs are harmless no-ops on the v1 page
+  // defaults — kept in sync with site-tweaks-v2.jsx
   const T = { motion: 6, distortion: 35, grain: 55, drift: true,
-              paper: 55, dust: 40, misreg: 45, vignette: 35, tape: true };
+              paper: 55, dust: 40, misreg: 45, vignette: 35, tape: true,
+              oil: 55, rings: true, warp: 45, hue: true, nap: 55 };
+
   const root = document.documentElement;
+  const body = document.body;
+  const disp = document.getElementById('vr-disp');
+  const warpDisp = document.getElementById('vr-warp-disp');
+  const tapeEl = document.getElementById('vr-count');
+
+  let restScale = 0;
+  let lastScaleStr = null;
 
   function applyStatic() {
     root.style.setProperty('--grain-o', (T.grain / 100).toFixed(3));
     root.style.setProperty('--clim-dur', T.drift ? '1.4s' : '0.25s');
-    // v2 analog plates
-    root.style.setProperty('--paper-o', (T.paper / 100 * 0.17).toFixed(3));
-    root.style.setProperty('--dust-o', (T.dust / 100 * 0.9).toFixed(3));
+    root.style.setProperty('--paper-o', (T.paper / 100 * 0.62).toFixed(3));
+    root.style.setProperty('--dust-o', (T.dust / 100 * 0.7).toFixed(3));
     root.style.setProperty('--misx', (T.misreg / 100 * 2.6).toFixed(2) + 'px');
     root.style.setProperty('--vig-o', (T.vignette / 100 * 0.30).toFixed(3));
-    document.body.dataset.tape = T.tape ? 'on' : 'off';
+    root.style.setProperty('--oil-o', (T.oil / 100 * 0.62).toFixed(3));
+    root.style.setProperty('--nap-o', (T.nap / 100 * 0.85).toFixed(3));
+    body.dataset.tape = T.tape ? 'on' : 'off';
+    body.dataset.rings = T.rings ? 'on' : 'off';
+    body.dataset.hue = T.hue ? 'on' : 'off';
+    if (warpDisp) warpDisp.setAttribute('scale', (T.warp / 100 * 7).toFixed(1));
+    restScale = reduced ? 0 : (T.distortion / 100) * 4.2;
+    lastScaleStr = null; // force one re-apply of the rest melt
+    kick();
   }
-  window.addEventListener('vr-tweaks', (e) => {
-    Object.assign(T, e.detail);
-    applyStatic();
-  });
-  applyStatic();
 
   // --- reveals -------------------------------------------------
   const io = new IntersectionObserver(
     (entries) => entries.forEach((en) => {
-      if (en.isIntersecting) en.target.classList.add('in');
+      if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
     }),
     { threshold: 0.18 }
   );
   document.querySelectorAll('.rv').forEach((el) => io.observe(el));
 
-  // --- liquid + climate + parallax loop ------------------------
-  const turb = document.getElementById('vr-turb');
-  const disp = document.getElementById('vr-disp');
-  const secs = Array.from(document.querySelectorAll('section[data-climate]'));
-  const plx = Array.from(document.querySelectorAll('[data-plx]'));
+  /* --- geometry, measured once ---------------------------------
+     absolute document offsets so the frame loop never touches the
+     layout engine. re-measured on resize and after images land. */
+  let secs = [], plx = [], vh = 1, maxY = 1;
 
-  let lastY = window.scrollY;
-  let vel = 0;
-  const t0 = performance.now();
-  const tapeEl = document.getElementById('vr-count'); // v2 tape counter (absent on v1)
+  function measure() {
+    vh = window.innerHeight;
+    maxY = Math.max(1, root.scrollHeight - vh);
+    const sy = window.scrollY;
+    secs = Array.from(document.querySelectorAll('[data-climate]'))
+      .filter((el) => el !== body)
+      .map((el) => {
+        const r = el.getBoundingClientRect();
+        return { c: el.dataset.climate, top: r.top + sy, bot: r.top + sy + r.height };
+      });
+    plx = Array.from(document.querySelectorAll('[data-plx]')).map((el) => {
+      const r = el.getBoundingClientRect();
+      return { el, amt: parseFloat(el.dataset.plx || '24'),
+               mid: r.top + sy + r.height / 2, last: '' };
+    });
+  }
 
-  function frame(now) {
-    const t = (now - t0) / 1000;
-    const y = window.scrollY;
-    vel += (y - lastY - vel) * 0.1; // smoothed velocity, px/frame
+  // --- the loop: runs only while there is something to move -----
+  let running = false, idle = 0;
+  let lastY = window.scrollY, vel = 0, cur = -1, flip = false;
+
+  function kick() {
+    idle = 0;
+    if (!running) { running = true; requestAnimationFrame(frame); }
+  }
+
+  function frame() {
+    const y = window.scrollY;                 // the only read. no layout.
+    vel += (y - lastY - vel) * 0.16;          // smoothed velocity, px/frame
     lastY = y;
+    if (Math.abs(vel) < 0.05) vel = 0;
 
-    // tape wow: baseFrequency drifts slowly; scroll velocity melts harder
-    if (!reduced && turb && disp) {
-      const wow = 0.006 + Math.sin(t * 0.31) * 0.0011 + Math.sin(t * 0.11 + 2) * 0.0007;
-      turb.setAttribute('baseFrequency', wow.toFixed(4) + ' ' + (wow * 1.7).toFixed(4));
-      const rest = (T.distortion / 100) * 7;
-      const kick = Math.min(70, Math.abs(vel) * (T.motion / 6));
-      disp.setAttribute('scale', (rest + kick).toFixed(1));
+    let quiet = vel === 0;
+
+    // melt — type only; quantized, every other frame, silent once settled
+    flip = !flip;
+    if (!reduced && disp) {
+      const target = quiet ? restScale
+        : restScale + Math.min(34, Math.abs(vel) * (T.motion / 6) * 0.95);
+      let next = cur < 0 ? target : cur + (target - cur) * 0.18;
+      if (Math.abs(next - target) < 0.05) next = target; else quiet = false;
+      cur = next;
+      if (flip || lastScaleStr === null) {
+        const s = (Math.round(next * 4) / 4).toFixed(2);
+        if (s !== lastScaleStr) { disp.setAttribute('scale', s); lastScaleStr = s; }
+      }
     }
 
-    // climate: section under the viewport center owns the ground
-    const mid = window.innerHeight * 0.5;
-    for (const s of secs) {
-      const r = s.getBoundingClientRect();
-      if (r.top <= mid && r.bottom > mid) {
-        const c = s.dataset.climate;
-        if (document.body.dataset.climate !== c) document.body.dataset.climate = c;
+    // climate: whichever band owns the viewport center
+    const mid = y + vh * 0.5;
+    for (let i = 0; i < secs.length; i++) {
+      const s = secs[i];
+      if (mid >= s.top && mid < s.bot) {
+        if (body.dataset.climate !== s.c) body.dataset.climate = s.c;
         break;
       }
     }
 
-    // parallax drift
-    if (!reduced) {
-      const amp = T.motion / 6;
-      for (const el of plx) {
-        const r = el.getBoundingClientRect();
-        const d = (r.top + r.height / 2 - mid) / window.innerHeight;
-        el.style.transform =
-          'translateY(' + (d * parseFloat(el.dataset.plx || '24') * amp).toFixed(1) + 'px)';
-      }
+    /* parallax + tape stretch — pure transform, so photos are moved by
+       the compositor and never re-painted or re-filtered */
+    const stretch = reduced ? 0 : Math.min(0.02, Math.abs(vel) * 0.0009);
+    const skew = reduced ? 0 : Math.max(-0.5, Math.min(0.5, vel * 0.014));
+    for (let i = 0; i < plx.length; i++) {
+      const p = plx[i];
+      const ty = ((p.mid - mid) / vh) * p.amt * (T.motion / 6);
+      const t = 'translate3d(0,' + ty.toFixed(1) + 'px,0) scaleY(' +
+                (1 + stretch).toFixed(4) + ') skewY(' + skew.toFixed(2) + 'deg)';
+      if (t !== p.last) { p.el.style.transform = t; p.last = t; }
     }
 
     // tape counter — reel position from scroll depth
     if (tapeEl) {
-      const max = document.documentElement.scrollHeight - window.innerHeight;
-      const n = Math.max(0, Math.min(999, Math.round((max > 0 ? y / max : 0) * 999)));
+      const n = Math.max(0, Math.min(999, Math.round((y / maxY) * 999)));
       const s = String(n).padStart(3, '0');
       if (tapeEl.textContent !== s) tapeEl.textContent = s;
     }
 
+    if (quiet && ++idle > 6) { running = false; return; }  // sleep
     requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+
+  // --- wiring ---------------------------------------------------
+  addEventListener('scroll', kick, { passive: true });
+  addEventListener('resize', () => { measure(); kick(); }, { passive: true });
+  addEventListener('vr-tweaks', (e) => { Object.assign(T, e.detail); applyStatic(); });
+  addEventListener('load', () => { measure(); kick(); });
+
+  applyStatic();
+  measure();
+  kick();
 })();
