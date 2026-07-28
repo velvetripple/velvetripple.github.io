@@ -1,3 +1,4 @@
+<!-- @dsCard group="UI Kit — Web" name="Web — Liquid Velvet Site v2 · analog" subtitle="Materiality pass · paper fiber, projector dust, print misregistration, film rebates, tape counter" viewport="1280x800" -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,19 +9,17 @@
 <link rel="stylesheet" href="colors_and_type.css">
 <style>
   /* ============================================================
-     VELVET RIPPLE — Liquid Velvet site · v4
+     VELVET RIPPLE — Liquid Velvet site · v2 analog materiality
      calm at rest · liquefies on scroll · bone sinks to inkwell
-     indie psychedelia: a liquid light show under every scene,
-     climate-graded photos, ripple rings, warped display type
-     analog: paper fiber · velvet nap · dust · vignette ·
-     misregistered print · film rebates · tape counter
+     v2: paper fiber · projector dust · vignette · misregistered
+     print · film rebates on photos · tape counter
      ============================================================ */
   *{ box-sizing:border-box; margin:0; padding:0; }
   html{ scroll-behavior:smooth; }
 
   /* page climate — JS flips body[data-climate] as you descend */
   body{ --pg:#EFE7D6; --pfg:#161311;
-        --pfg2:rgba(22,19,17,.62); --pfg3:rgba(22,19,17,.52);
+        --pfg2:rgba(22,19,17,.62); --pfg3:rgba(22,19,17,.42);
         --prule:rgba(22,19,17,.18);
         /* v2 print-plate colors per climate */
         --mis-a:rgba(107,30,26,.32); --mis-b:rgba(43,69,73,.18); --halo:rgba(0,0,0,0);
@@ -30,70 +29,55 @@
         transition:background-color var(--clim-dur,1.4s) ease, color var(--clim-dur,1.4s) ease;
         overflow-x:hidden; }
   body[data-climate="teal"]{ --pg:#2B4549; --pfg:#EFE7D6;
-        --pfg2:rgba(239,231,214,.66); --pfg3:rgba(239,231,214,.46);
+        --pfg2:rgba(239,231,214,.66); --pfg3:rgba(239,231,214,.42);
         --prule:rgba(239,231,214,.20);
         --mis-a:rgba(22,19,17,.42); --mis-b:rgba(239,231,214,.14); --halo:rgba(217,162,75,.10); }
   body[data-climate="ink"]{ --pg:#161311; --pfg:#EFE7D6;
-        --pfg2:rgba(239,231,214,.62); --pfg3:rgba(239,231,214,.44);
+        --pfg2:rgba(239,231,214,.62); --pfg3:rgba(239,231,214,.36);
         --prule:rgba(239,231,214,.16);
         --mis-a:rgba(107,30,26,.55); --mis-b:rgba(217,162,75,.16); --halo:rgba(217,162,75,.15); }
 
   a{ color:inherit; text-decoration:none; }
   ::selection{ background:#6B1E1A; color:#EFE7D6; }
 
-  /* focus — the system's oxblood outline comes from colors_and_type.css;
-     on dark climates honey carries it instead */
-  body[data-climate="teal"] :focus-visible,
-  body[data-climate="ink"] :focus-visible{ outline-color:var(--vr-honey); }
-
   .mono{ font-family:var(--font-mono); font-size:11px; letter-spacing:.16em;
          text-transform:uppercase; color:var(--pfg3);
          transition:color var(--clim-dur,1.4s) ease; }
 
-  /* the liquid — the melt filter drives DISPLAY TYPE ONLY. photos are
-     moved by the compositor (transforms), never re-rasterized. */
-  /* velvet type — melt via #vr-liquid; the pile lives in the glyph fill
-     (background-clip:text = painted once, zero per-frame cost) */
-  .velvet-word, .warp{ background-color:var(--pfg);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='210' height='210'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5 0.04' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23v)' opacity='0.32'/%3E%3C/svg%3E"),
-      linear-gradient(115deg, rgba(217,162,75,0) 40%, rgba(217,162,75,.2) 50%, rgba(217,162,75,0) 60%);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    transition:background-color var(--clim-dur,1.4s) ease; }
-  .velvet-word{ filter:url(#vr-liquid); will-change:filter; }
+  /* the liquid — JS drives #vr-turb / #vr-disp */
+  .liquefy{ filter:url(#vr-liquid); will-change:filter; }
 
-  /* ---- material plates ----------------------------------------
-     budget: exactly TWO blended full-viewport layers. every extra one
-     forces the whole viewport to recomposite on each scroll frame,
-     which is what made v3 sludgy. paper + velvet nap + projector dust
-     are one static soft-light sheet; grain is the only animated plate;
-     the vignette is plain alpha, so it costs nothing to blend. */
-  .stock{ position:fixed; inset:0; pointer-events:none; z-index:58;
-    mix-blend-mode:soft-light; opacity:var(--paper-o,.5);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.010 0.30' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.55'/%3E%3C/svg%3E"); }
-  /* the nap and the dust ride INSIDE the same blended layer as pseudo-
-     elements — independent knobs, still only one viewport blend */
-  .stock::before, .stock::after{ content:""; position:absolute; inset:0; }
-  .stock::before{ opacity:var(--nap-o,.55);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='210' height='210'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55 0.035' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23v)' opacity='0.6'/%3E%3C/svg%3E"),
-      linear-gradient(115deg, rgba(239,231,214,0) 30%, rgba(239,231,214,.45) 44%, rgba(217,162,75,.26) 50%, rgba(239,231,214,.45) 56%, rgba(239,231,214,0) 70%); }
-  .stock::after{ opacity:var(--dust-o,.4);
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='430' height='430'%3E%3Cg fill='%23141009'%3E%3Ccircle cx='63' cy='118' r='1.1'/%3E%3Ccircle cx='299' cy='47' r='.7'/%3E%3Ccircle cx='372' cy='268' r='1.3'/%3E%3Ccircle cx='151' cy='341' r='.8'/%3E%3Crect x='218' y='166' width='1' height='9' transform='rotate(24 218 166)'/%3E%3C/g%3E%3C/svg%3E"); }
-
-  /* film grain — the one animated plate; transform-only jitter */
+  /* film grain — two fixed plates, opacity via --grain-o */
   .grain{ position:fixed; inset:-60px; pointer-events:none; z-index:60;
-    mix-blend-mode:multiply; opacity:calc(var(--grain-o,.55) * .5);
-    will-change:transform; animation:grainJig 1.1s steps(4) infinite;
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E"); }
+  .grain-d{ mix-blend-mode:multiply; opacity:calc(var(--grain-o,.55) * .42); animation:grainJig 1.1s steps(4) infinite; }
+  .grain-l{ mix-blend-mode:screen;   opacity:calc(var(--grain-o,.55) * .22); animation:grainJig 0.9s steps(3) infinite reverse; }
   @keyframes grainJig{
-    0%{ transform:translate3d(0,0,0); } 25%{ transform:translate3d(-22px,14px,0); }
-    50%{ transform:translate3d(14px,-26px,0); } 75%{ transform:translate3d(-10px,-12px,0); }
-    100%{ transform:translate3d(0,0,0); } }
+    0%{ transform:translate(0,0); } 25%{ transform:translate(-22px,14px); }
+    50%{ transform:translate(14px,-26px); } 75%{ transform:translate(-10px,-12px); }
+    100%{ transform:translate(0,0); } }
 
-  /* v2 · enlarger vignette — alpha only, never blended */
+  /* v2 · paper fiber — static laid-stock plate, strongest on bone */
+  .paper{ position:fixed; inset:0; pointer-events:none; z-index:58;
+    mix-blend-mode:multiply; opacity:var(--paper-o,.09);
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.010 0.30' numOctaves='3' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='0.55'/%3E%3C/svg%3E"); }
+
+  /* v2 · projector dust — sparse specks that relocate */
+  .dust{ position:fixed; inset:-80px; pointer-events:none; z-index:61;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='430' height='430'%3E%3Cg fill='%23141009'%3E%3Ccircle cx='63' cy='118' r='1.1'/%3E%3Ccircle cx='299' cy='47' r='.7'/%3E%3Ccircle cx='372' cy='268' r='1.3'/%3E%3Ccircle cx='151' cy='341' r='.8'/%3E%3Crect x='218' y='166' width='1' height='9' transform='rotate(24 218 166)'/%3E%3C/g%3E%3C/svg%3E"); }
+  .dust-d{ mix-blend-mode:multiply; opacity:calc(var(--dust-o,.40) * .55); animation:dustDrift 2.8s steps(6) infinite; }
+  .dust-l{ mix-blend-mode:screen; opacity:calc(var(--dust-o,.40) * .30); animation:dustDrift 3.7s steps(5) infinite reverse;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='430' height='430'%3E%3Cg fill='%23EFE7D6'%3E%3Ccircle cx='341' cy='95' r='.9'/%3E%3Ccircle cx='87' cy='276' r='1.2'/%3E%3Ccircle cx='204' cy='399' r='.7'/%3E%3C/g%3E%3C/svg%3E"); }
+  @keyframes dustDrift{
+    0%{ transform:translate(0,0); } 20%{ transform:translate(-214px,146px); }
+    40%{ transform:translate(122px,-238px); } 60%{ transform:translate(-96px,-180px); }
+    80%{ transform:translate(196px,84px); } 100%{ transform:translate(0,0); } }
+
+  /* v2 · enlarger vignette */
   .vig{ position:fixed; inset:0; pointer-events:none; z-index:57;
     background:radial-gradient(ellipse 118% 96% at 50% 46%, rgba(0,0,0,0) 56%, rgba(18,14,11,var(--vig-o,.10)) 128%); }
 
-  @media (prefers-reduced-motion: reduce){ .grain{ animation:none; } }
+  @media (prefers-reduced-motion: reduce){ .grain-d,.grain-l,.dust-d,.dust-l{ animation:none; } }
 
   /* v2 · misregistered print — second pass slightly off-register;
      on dark grounds the ghost warms into halation */
@@ -122,82 +106,15 @@
     transition:color var(--clim-dur,1.4s) ease; }
   body[data-tape="off"] .tape{ display:none; }
 
-  /* v4 · indie psychedelia — the liquid light show.
-     wet-plate projector pools in brand inks, running under EVERY scene.
-     scoped per-section + isolation:isolate so the blend is contained to
-     that section's box instead of promoting the whole page. blobs move
-     on transform and breathe on opacity — both compositor-only, so the
-     light show is free during scroll. */
-  .lit{ isolation:isolate; }
-  .oil{ position:absolute; inset:0; overflow:hidden; pointer-events:none;
-    mix-blend-mode:multiply; opacity:var(--oil-o,.34); }
-  body[data-climate="teal"] .oil, body[data-climate="ink"] .oil{ mix-blend-mode:screen; }
-  .oil i{ position:absolute; border-radius:50%; will-change:transform,opacity; }
-  .oil .o1{ width:58vmin; height:46vmin; left:10%; top:12%;
-    background:radial-gradient(closest-side, rgba(107,30,26,.85), rgba(107,30,26,0) 72%);
-    animation:oilA 47s ease-in-out infinite alternate; }
-  .oil .o2{ width:66vmin; height:54vmin; right:6%; top:26%;
-    background:radial-gradient(closest-side, rgba(43,69,73,.8), rgba(43,69,73,0) 70%);
-    animation:oilB 61s ease-in-out infinite alternate; }
-  .oil .o3{ width:48vmin; height:44vmin; left:34%; bottom:2%;
-    background:radial-gradient(closest-side, rgba(217,162,75,.68), rgba(217,162,75,0) 74%);
-    animation:oilC 73s ease-in-out infinite alternate; }
-  .oil .o4{ width:40vmin; height:52vmin; left:58%; top:4%;
-    background:radial-gradient(closest-side, rgba(196,107,31,.55), rgba(196,107,31,0) 76%);
-    animation:oilD 67s ease-in-out infinite alternate; }
-  @keyframes oilA{ from{ transform:translate3d(0,0,0) scale(1); } to{ transform:translate3d(9vmin,6vmin,0) scale(1.28); } }
-  @keyframes oilB{ from{ transform:translate3d(0,0,0) scale(1.15); } to{ transform:translate3d(-12vmin,5vmin,0) scale(.88); } }
-  @keyframes oilC{ from{ transform:translate3d(0,0,0) scale(1); } to{ transform:translate3d(7vmin,-9vmin,0) scale(1.32); } }
-  @keyframes oilD{ from{ transform:translate3d(0,0,0) scale(.9); } to{ transform:translate3d(-8vmin,8vmin,0) scale(1.2); } }
-  /* colour wander without hue-rotate: the pools cross-fade at different
-     periods, so the overlaps mix new colour on their own (free) */
-  body[data-hue="on"] .oil .o1{ animation:oilA 47s ease-in-out infinite alternate, oilFade 29s ease-in-out infinite alternate; }
-  body[data-hue="on"] .oil .o2{ animation:oilB 61s ease-in-out infinite alternate, oilFade 37s ease-in-out infinite alternate -9s; }
-  body[data-hue="on"] .oil .o3{ animation:oilC 73s ease-in-out infinite alternate, oilFade 43s ease-in-out infinite alternate -21s; }
-  body[data-hue="on"] .oil .o4{ animation:oilD 67s ease-in-out infinite alternate, oilFade 31s ease-in-out infinite alternate -14s; }
-  @keyframes oilFade{ from{ opacity:.45; } to{ opacity:1; } }
-
-  /* v4 · psych photo grade — deepens with the climate, set once per
-     climate change (never per frame) */
-  .film img{ transition:filter var(--clim-dur,1.4s) ease; }
-  body[data-climate="teal"] .film img{ filter:saturate(.82) contrast(1.09) sepia(.12) hue-rotate(-6deg); }
-  body[data-climate="ink"] .film img{ filter:saturate(.72) contrast(1.14) sepia(.2) hue-rotate(-12deg) brightness(.94); }
-
-  /* v4 · wavy rule — the ripple as a divider */
-  .ripple-rule{ height:6px; border:0; margin:0 auto; width:min(680px,72vw); opacity:.75;
-    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='6'%3E%3Cpath d='M0 3 Q 6.5 0 13 3 T 26 3' fill='none' stroke='%23EFE7D6' stroke-opacity='.34'/%3E%3C/svg%3E") repeat-x; }
-
-  /* v3 · ripple rings — slow sonar circles behind the word */
-  .rings{ position:absolute; inset:0; display:grid; place-items:center; pointer-events:none; }
-  .rings i{ grid-area:1/1; width:36vmin; height:36vmin; border-radius:50%;
-    border:1px solid var(--prule); opacity:0; will-change:transform,opacity;
-    animation:ripple 13s linear infinite; }
-  .rings i:nth-child(even){ border-color:rgba(217,162,75,.34); }
-  .rings i:nth-child(2){ animation-delay:3.25s; } .rings i:nth-child(3){ animation-delay:6.5s; }
-  .rings i:nth-child(4){ animation-delay:9.75s; }
-  @keyframes ripple{ 0%{ transform:scale(.3); opacity:0; } 10%{ opacity:.55; }
-    70%{ opacity:.16; } 100%{ transform:scale(3.2); opacity:0; } }
-  body[data-rings="off"] .rings{ display:none; }
-
-  /* v3 · type warp — static melt on display titles (#vr-warp is never
-     mutated per frame; renders once, cached) */
-  .warp{ filter:url(#vr-warp); }
-
-  @media (prefers-reduced-motion: reduce){
-    .oil, .oil i, .rings i, .cue-ring{ animation:none !important; } }
-
   /* nav */
   nav{ position:fixed; top:0; left:0; right:0; z-index:40;
        display:flex; align-items:baseline; gap:28px; padding:22px 40px; }
   .nav-mark{ font-family:var(--font-display); font-size:17px; letter-spacing:.06em; margin-right:auto; }
   nav a.lnk{ font-family:var(--font-mono); font-size:10px; letter-spacing:.18em;
-       text-transform:uppercase; color:var(--pfg3); transition:color var(--dur-hover,400ms) ease; }
+       text-transform:uppercase; color:var(--pfg3); transition:color .5s ease; }
   nav a.lnk:hover{ color:var(--pfg); }
 
   section{ position:relative; }
-
-  /* photos ride the compositor: the scroll loop writes only transform */
-  [data-plx]{ will-change:transform; }
 
   /* reveals */
   .rv{ opacity:0; transform:translateY(26px); transition:opacity 1.3s ease, transform 1.3s ease; }
@@ -210,8 +127,7 @@
   .hero-word{ font-family:var(--font-display); font-weight:400; text-transform:uppercase;
        font-size:clamp(3.6rem,11.5vw,10rem); line-height:.96; letter-spacing:.09em;
        text-indent:.09em; }
-  @keyframes vrBreathe{ 0%,100%{ transform:scale(1) skewX(0deg); }
-    33%{ transform:scale(1.008) skewX(.22deg); } 66%{ transform:scale(1.014) skewX(-.18deg); } }
+  @keyframes vrBreathe{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.012); } }
   @media (prefers-reduced-motion: no-preference){
     .hero-word{ animation:vrBreathe 9s ease-in-out infinite; } }
   .hero-sub{ font-family:var(--font-display); font-style:italic;
@@ -220,14 +136,8 @@
   .hero-strip{ width:min(560px,82vw); aspect-ratio:21/9; overflow:hidden; }
   .hero-strip img{ width:100%; height:100%; object-fit:cover; display:block;
        filter:saturate(.9) contrast(1.05) sepia(.07); }
-  .hero-cue{ position:absolute; bottom:18px; left:50%; transform:translateX(-50%);
-       width:96px; height:96px; display:grid; place-items:center; }
-  .cue-ring{ position:absolute; inset:0; overflow:visible; animation:cueSpin 28s linear infinite; }
-  .cue-ring text{ font-family:var(--font-mono); font-size:8px; letter-spacing:.28em;
-       text-transform:uppercase; fill:var(--pfg3); transition:fill var(--clim-dur,1.4s) ease; }
-  .cue-arrow{ font-family:var(--font-mono); font-size:12px; color:var(--pfg2);
+  .hero-cue{ position:absolute; bottom:26px; left:50%; transform:translateX(-50%);
        animation:cuePulse 3.2s ease-in-out infinite; }
-  @keyframes cueSpin{ to{ transform:rotate(360deg); } }
   @keyframes cuePulse{ 0%,100%{ opacity:.35; } 50%{ opacity:.85; } }
 
   /* ---------- 2 · THESIS ---------- */
@@ -271,7 +181,7 @@
 
   /* ---------- 5 · THE WORD ---------- */
   .word{ min-height:100vh; display:flex; flex-direction:column; align-items:center;
-       justify-content:center; gap:38px; text-align:center; padding:120px 24px; overflow:hidden; }
+       justify-content:center; gap:38px; text-align:center; padding:120px 24px; }
   .word-lyric{ font-family:var(--font-display); font-weight:400;
        font-size:clamp(2rem,5vw,4.2rem); line-height:1.3; max-width:18ch; }
 
@@ -283,23 +193,17 @@
   .letter-copy{ font-family:var(--font-body); font-size:.98rem; line-height:1.7;
        color:var(--pfg2); max-width:44ch; transition:color var(--clim-dur,1.4s) ease; }
   .letter-form{ display:flex; width:min(440px,86vw); border-bottom:1px solid var(--pfg2);
-       margin-top:14px; transition:border-color var(--dur-hover,400ms) ease; }
-  .letter-form:focus-within{ border-bottom-color:var(--vr-honey); }
-  .letter-form.err{ border-bottom-color:var(--error-on-deep,#D99A93); }
+       margin-top:14px; }
   .letter-form input{ flex:1; background:none; border:none; outline:none; color:var(--pfg);
        font-family:var(--font-body); font-size:1.02rem; padding:12px 2px; }
   .letter-form input::placeholder{ color:var(--pfg3); }
   .letter-form button{ background:none; border:none; cursor:pointer; color:var(--pfg2);
        font-family:var(--font-mono); font-size:10px; letter-spacing:.2em;
-       text-transform:uppercase; padding:0 4px; transition:color var(--dur-hover,400ms) ease; }
-  .letter-form button:hover{ color:#D9A24B; } /* honey as text — legal here: ink climate only */
-  .letter-note{ font-family:var(--font-body); font-size:.88rem; line-height:1.6; min-height:1.6em; }
-  .letter-note.err{ color:var(--error-on-deep,#D99A93); }
-  .letter-note.ok{ color:var(--ok-on-deep,#A9BD97); }
+       text-transform:uppercase; padding:0 4px; transition:color .4s ease; }
+  .letter-form button:hover{ color:#D9A24B; }
 
-  footer{ display:flex; align-items:baseline; gap:24px; padding:40px; position:relative; }
-  footer::before{ content:""; position:absolute; top:0; left:40px; right:40px; height:6px;
-       background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='6'%3E%3Cpath d='M0 3 Q 6.5 0 13 3 T 26 3' fill='none' stroke='%23EFE7D6' stroke-opacity='.28'/%3E%3C/svg%3E") repeat-x; }
+  footer{ display:flex; align-items:baseline; gap:24px; padding:40px;
+       border-top:1px solid var(--prule); }
   footer .nav-mark{ font-size:15px; }
   footer .mono a:hover{ color:var(--pfg); }
   footer .right{ margin-left:auto; }
@@ -319,20 +223,18 @@
 
 <!-- the liquid filter — JS warbles baseFrequency + scale -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <filter id="vr-liquid" x="-8%" y="-8%" width="116%" height="116%">
+  <filter id="vr-liquid" x="-15%" y="-15%" width="130%" height="130%">
     <feTurbulence id="vr-turb" type="fractalNoise" baseFrequency="0.006 0.010" numOctaves="2" seed="7" result="n"></feTurbulence>
     <feDisplacementMap id="vr-disp" in="SourceGraphic" in2="n" scale="3" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
-  </filter>
-  <!-- static type-warp — attributes only change from the Tweaks knob -->
-  <filter id="vr-warp" x="-12%" y="-12%" width="124%" height="124%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.011 0.02" numOctaves="1" seed="3" result="wn"></feTurbulence>
-    <feDisplacementMap id="vr-warp-disp" in="SourceGraphic" in2="wn" scale="3.2" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
   </filter>
 </svg>
 
 <div class="vig" aria-hidden="true"></div>
-<div class="stock" aria-hidden="true"></div>
-<div class="grain" aria-hidden="true"></div>
+<div class="paper" aria-hidden="true"></div>
+<div class="grain grain-d" aria-hidden="true"></div>
+<div class="grain grain-l" aria-hidden="true"></div>
+<div class="dust dust-d" aria-hidden="true"></div>
+<div class="dust dust-l" aria-hidden="true"></div>
 
 <div class="tape" aria-hidden="true">
   <span class="tc-count" id="vr-count">000</span>
@@ -348,39 +250,33 @@
 </nav>
 
 <!-- 1 · HERO -->
-<section class="hero lit" id="top" data-climate="bone" data-screen-label="hero">
-  <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
-  <div class="rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <span class="mono">vr — 001 · indie psychedelia · arizona</span>
-  <h1 class="hero-word velvet-word misreg">velvet<br>ripple</h1>
+<section class="hero" id="top" data-climate="bone" data-screen-label="hero">
+  <span class="mono">vr — 001 · experimental analog · arizona</span>
+  <h1 class="hero-word liquefy misreg">velvet<br>ripple</h1>
   <p class="hero-sub">the in-between hour, recorded.</p>
-  <div class="hero-strip film" data-plx="22">
+  <div class="hero-strip liquefy film" data-plx="22">
     <img src="assets/photos/williams-drive.png" alt="dusk highway west of williams, arizona">
     <span class="rebate">vr–400 ▸ leader</span>
   </div>
-  <div class="hero-cue" aria-hidden="true">
-    <svg class="cue-ring" viewBox="0 0 100 100"><defs><path id="cue-o" d="M50,50 m-39,0 a39,39 0 1,1 78,0 a39,39 0 1,1 -78,0"></path></defs><text><textPath href="#cue-o">slow · velvet ripple · vr — 001 ·&#160;</textPath></text></svg>
-    <span class="cue-arrow">↓</span>
-  </div>
+  <span class="mono hero-cue">↓ slow</span>
 </section>
 
 <!-- 2 · THESIS -->
 <section class="thesis" data-climate="bone" data-screen-label="thesis">
-  <p class="thesis-line rv velvet-word misreg">songs held to tape until they keep their shape.</p>
-  <p class="thesis-sub rv">indie psychedelia out of arizona.</p>
+  <p class="thesis-line rv liquefy misreg">songs held to tape until they keep their shape.</p>
+  <p class="thesis-sub rv">experimental analog music out of arizona.</p>
 </section>
 
 <!-- 3 · FORMING -->
-<section class="forming lit" id="forming" data-climate="teal" data-screen-label="forming">
-  <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
-  <div class="forming-art rv film" data-plx="16">
+<section class="forming" id="forming" data-climate="teal" data-screen-label="forming">
+  <div class="forming-art rv liquefy film" data-plx="16">
     <img src="assets/photos/cover-bark.jpg" alt="unfocused texture — a record still forming">
     <div class="veil"></div>
     <span class="mono stamp" style="color:rgba(239,231,214,.6)">untitled · in the studio</span>
   </div>
   <div class="forming-copy">
     <span class="mono rv">001 — forming</span>
-    <h2 class="forming-title rv misreg warp">something is taking shape.</h2>
+    <h2 class="forming-title rv misreg">something is taking shape.</h2>
     <p class="forming-it rv">it isn&rsquo;t named here yet. tape first; titles later. when it can hold its own weight, you&rsquo;ll hear it.</p>
     <div class="forming-meta rv">
       <span class="mono">SIX-TRACK</span>
@@ -396,47 +292,57 @@
 <section class="field" id="field" data-climate="teal" data-screen-label="field notes">
   <div class="field-head">
     <span class="mono rv">field notes</span>
-    <h2 class="field-title rv misreg warp">observed, not announced.</h2>
+    <h2 class="field-title rv misreg">observed, not announced.</h2>
   </div>
   <div class="field-grid">
     <article class="fnote rv" data-plx="14">
-      <figure class="film"><img src="assets/photos/williams-drive.png" alt="sunset drive west of williams"><span class="rebate">vr–400 ▸ 07a</span></figure>
+      <figure class="liquefy film"><img src="assets/photos/williams-drive.png" alt="sunset drive west of williams"><span class="rebate">vr–400 ▸ 07a</span></figure>
       <p class="fnote-cap">west of williams. the warm part of the sky only lasts a mile. 7:38 pm.</p>
       <span class="mono">vr — 001</span>
     </article>
     <article class="fnote rv" data-plx="30">
-      <figure class="film"><img src="assets/photos/studio-desk.jpg" alt="studio desk, warm lamp"><span class="rebate">vr–400 ▸ 12a</span></figure>
+      <figure class="liquefy film"><img src="assets/photos/studio-desk.jpg" alt="studio desk, warm lamp"><span class="rebate">vr–400 ▸ 12a</span></figure>
       <p class="fnote-cap">lavender puts it into perspective.</p>
       <span class="mono">vr — 001</span>
     </article>
     <article class="fnote rv" data-plx="20">
-      <figure class="film"><img src="assets/photos/guitar-desk.png" alt="hands on an electric guitar at the desk, one lamp and a screen"><span class="rebate">vr–400 ▸ 31a</span></figure>
-      <p class="fnote-cap">one lamp, one screen. 12:40 am. nothing named yet.</p>
+      <figure class="liquefy film"><img src="assets/photos/nightcar-sq.jpg" alt="night drive, dashboard glow"><span class="rebate">vr–400 ▸ 22a</span></figure>
+      <p class="fnote-cap">&nbsp;</p>
       <span class="mono">vr — 001</span>
     </article>
   </div>
 </section>
 
 <!-- 5 · THE WORD -->
-<section class="word lit" id="word" data-climate="ink" data-screen-label="the word">
-  <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
-  <div class="rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+<section class="word" id="word" data-climate="ink" data-screen-label="the word">
   <span class="mono rv">the word</span>
-  <p class="word-lyric rv velvet-word misreg">the river keeps the bend<br>even after we leave.</p>
+  <p class="word-lyric rv liquefy misreg">the river keeps the bend<br>even after we leave.</p>
   <span class="mono rv">vr — 001</span>
 </section>
 
 <!-- 6 · THE LETTER -->
-<section class="letter lit" id="letter" data-climate="ink" data-screen-label="the letter">
-  <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
-  <hr class="ripple-rule" aria-hidden="true">
-  <h2 class="letter-title rv misreg warp">the letter</h2>
+<section class="letter" id="letter" data-climate="ink" data-screen-label="the letter">
+  <h2 class="letter-title rv misreg">the letter</h2>
   <p class="letter-copy rv">a note when there is something true to say. observations, not announcements.</p>
-  <form class="letter-form rv" id="letter-form" novalidate>
-    <input type="email" placeholder="your address" aria-label="email address" required>
+  <!-- posts to EmailOctopus form a2d98e58 · nothing to configure -->
+  <form class="letter-form rv" id="eo-form" method="post" target="eo-sink" novalidate
+        action="https://eomail5.com/form/a2d98e58-8abf-11f1-98b9-2bc8e1536409">
+    <input type="email" name="field_0" required autocomplete="email"
+           placeholder="your address" aria-label="email address">
+    <!-- EmailOctopus honeypot — bots fill it, people never see it -->
+    <input type="text" name="hpc4b27b6e-eb38-11e9-be00-06b4694bee2a"
+           tabindex="-1" autocomplete="off" aria-hidden="true"
+           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
     <button type="submit">send</button>
   </form>
-  <p class="letter-note" id="letter-note" aria-live="polite"></p>
+
+  <!-- your confirmation line, in your own type -->
+  <p class="mono" id="eo-note" role="status" aria-live="polite"
+     style="min-height:1.2em;opacity:0;transition:opacity .7s ease;color:#D9A24B">&nbsp;</p>
+
+  <!-- the POST lands in here; the visitor's page never moves -->
+  <iframe name="eo-sink" title="signup" aria-hidden="true" tabindex="-1"
+          style="position:absolute;width:0;height:0;border:0;visibility:hidden"></iframe>
 </section>
 
 <footer data-climate="ink">
@@ -445,27 +351,37 @@
   <span class="mono right">vr — 001 · mmxxvi</span>
 </footer>
 
-
 <script src="liquid-scroll.js"></script>
+
+<!-- the letter — silent signup, no third-party UI -->
 <script>
-/* the letter — system form states: error in claret, confirmation in moss, stated once */
-(() => {
-  const form = document.getElementById('letter-form');
-  const input = form.querySelector('input');
-  const note = document.getElementById('letter-note');
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const ok = input.value.trim() !== '' && input.checkValidity();
-    input.setAttribute('aria-invalid', ok ? 'false' : 'true');
-    form.classList.toggle('err', !ok);
-    note.className = 'letter-note ' + (ok ? 'ok' : 'err');
-    note.textContent = ok ? "you're on the list. quiet from here."
-                          : "that address doesn't look right.";
-    if (ok) form.reset();
-  });
-  input.addEventListener('input', () => {
-    form.classList.remove('err');
-    if (note.classList.contains('err')) { note.className = 'letter-note'; note.textContent = ''; }
+(function () {
+  var f = document.getElementById('eo-form');
+  if (!f) return;
+  var note  = document.getElementById('eo-note'),
+      email = f.querySelector('input[type=email]'),
+      btn   = f.querySelector('button'),
+      sent  = false;
+
+  function say(msg) { note.textContent = msg; note.style.opacity = 1; }
+
+  f.addEventListener('submit', function (e) {
+    var v = (email.value || '').trim();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v)) {
+      e.preventDefault(); say('that address looks unfinished.'); return;
+    }
+    if (sent) { e.preventDefault(); return; }
+
+    // no preventDefault here — the browser POSTs into the hidden iframe,
+    // so EmailOctopus never renders and this page never navigates.
+    sent = true;
+    btn.disabled = true;
+    setTimeout(function () {
+      f.reset();
+      say('noted. the letter will find you.');
+      email.blur();
+    }, 350);
   });
 })();
 </script>
