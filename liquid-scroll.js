@@ -31,7 +31,10 @@
 
   function applyStatic() {
     root.style.setProperty('--grain-o', (T.grain / 100).toFixed(3));
-    root.style.setProperty('--clim-dur', T.drift ? '1.4s' : '0.25s');
+    /* only the FOREGROUND (type, rules, photo grade) still eases on this.
+       the ground is scroll-linked, so a long duration here just left the
+       text lagging behind the colour it sits on. */
+    root.style.setProperty('--clim-dur', T.drift ? '0.45s' : '0.16s');
     root.style.setProperty('--paper-o', (T.paper / 100 * 0.62).toFixed(3));
     root.style.setProperty('--dust-o', (T.dust / 100 * 0.7).toFixed(3));
     root.style.setProperty('--misx', (T.misreg / 100 * 2.6).toFixed(2) + 'px');
@@ -61,6 +64,68 @@
      layout engine. re-measured on resize and after images land. */
   let secs = [], plx = [], vh = 1, maxY = 1;
 
+  /* --- the ground ----------------------------------------------
+     one solid pane per climate, stacked in document order and
+     crossfaded by opacity alone (compositor-only — no viewport
+     repaint, so the blended plates above never re-rasterize).
+     `bands` merges neighbouring sections that share a climate, so
+     hero+thesis are one bone band rather than two. */
+  let bands = [], panes = [], ground = null, lastOp = [];
+
+  /* CIE L* — perceptual lightness, 0..100. we need this because a
+     crossfade's midpoint is only a problem if you can SEE it. */
+  function lstar(css) {
+    const m = String(css).match(/[\d.]+/g);
+    if (!m) return 0;
+    const f = (v) => { const c = v / 255;
+      return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+    const Y = 0.2126 * f(+m[0]) + 0.7152 * f(+m[1]) + 0.0722 * f(+m[2]);
+    return Y > 0.008856 ? 116 * Math.cbrt(Y) - 16 : 903.3 * Y;
+  }
+
+  function buildTrack() {
+    bands = [];
+    for (let i = 0; i < secs.length; i++) {
+      const last = bands[bands.length - 1];
+      if (last && last.c === secs[i].c) last.bot = secs[i].bot;
+      else bands.push({ c: secs[i].c, top: secs[i].top, bot: secs[i].bot });
+    }
+    // rebuild the panes only when the climate order actually changed
+    const key = bands.map((b) => b.c).join(',');
+    if (!ground || ground.dataset.key !== key) {
+      if (ground) ground.remove();
+      ground = document.createElement('div');
+      ground.className = 'ground';
+      ground.dataset.key = key;
+      ground.setAttribute('aria-hidden', 'true');
+      ground.innerHTML = bands.map((b) => '<i class="g-' + b.c + '"></i>').join('');
+      body.insertBefore(ground, body.firstChild);
+      panes = Array.from(ground.children);
+      lastOp = panes.map(() => '');
+      if (panes[0]) { panes[0].style.opacity = '1'; lastOp[0] = '1'; }
+    }
+
+    /* per-boundary tuning — bands was just rebuilt, so always re-derive.
+
+       a crossfade's midpoint is a blend of the two grounds. between two
+       dark climates (teal→ink, ~21 L*) that blend is indistinguishable
+       from either end, so it can be long and lazy. between bone and teal
+       (~64 L*) it is a muddy sage that reads as neither colour — so the
+       further apart the two grounds are, the LESS scroll we should spend
+       in between them:
+         span — length of the fade, in viewport heights
+         lin  — how far to pull the curve from smoothstep toward linear.
+                smoothstep has zero slope at both ends, which on a
+                high-contrast pair reads as "stuck on beige, then a rush".
+                linear starts moving the instant you do. */
+    const lum = panes.map((el) => lstar(getComputedStyle(el).backgroundColor));
+    for (let i = 1; i < bands.length; i++) {
+      const d = Math.min(1, Math.abs(lum[i] - lum[i - 1]) / 100);
+      bands[i].span = Math.max(0.24, 0.62 - 0.58 * Math.pow(d, 1.5));
+      bands[i].lin = d;
+    }
+  }
+
   function measure() {
     vh = window.innerHeight;
     maxY = Math.max(1, root.scrollHeight - vh);
@@ -71,6 +136,7 @@
         const r = el.getBoundingClientRect();
         return { c: el.dataset.climate, top: r.top + sy, bot: r.top + sy + r.height };
       });
+    buildTrack();
     plx = Array.from(document.querySelectorAll('[data-plx]')).map((el) => {
       const r = el.getBoundingClientRect();
       return { el, amt: parseFloat(el.dataset.plx || '24'),
@@ -109,14 +175,36 @@
       }
     }
 
-    // climate: whichever band owns the viewport center
+    /* climate — a CONTINUOUS position along the band track rather than a
+       flip at the boundary. `p` is a float band index: 1.5 means halfway
+       from band 1 into band 2. the crossfade is spread over `half`px of
+       scroll either side of the boundary and smoothstepped, so the ground
+       moves with your finger and there is nothing left to lag. */
     const mid = y + vh * 0.5;
-    for (let i = 0; i < secs.length; i++) {
-      const s = secs[i];
-      if (mid >= s.top && mid < s.bot) {
-        if (body.dataset.climate !== s.c) body.dataset.climate = s.c;
-        break;
+    if (bands.length) {
+      let p = 0;
+      for (let i = 0; i < bands.length; i++) if (mid >= bands[i].top) p = i;
+      for (let i = 1; i < bands.length; i++) {
+        const w = vh * bands[i].span;          // fade length, in px of scroll
+        const d = mid - bands[i].top;
+        if (d > -w * 0.5 && d < w * 0.5) {
+          const u = d / w + 0.5;
+          const sm = u * u * (3 - 2 * u);
+          p = (i - 1) + sm + (u - sm) * bands[i].lin;
+          break;
+        }
       }
+      // pane 0 stays opaque; each later pane wipes in over the ones below it
+      for (let i = 1; i < panes.length; i++) {
+        const o = (p - i + 1 <= 0) ? '0'
+                : (p - i + 1 >= 1) ? '1'
+                : (p - i + 1).toFixed(3);
+        if (o !== lastOp[i]) { panes[i].style.opacity = o; lastOp[i] = o; }
+      }
+      // the foreground (type, rules, photo grade) still swaps discretely,
+      // at the midpoint of the ground's crossfade
+      const c = bands[Math.min(bands.length - 1, Math.round(p))].c;
+      if (body.dataset.climate !== c) body.dataset.climate = c;
     }
 
     /* parallax + tape stretch — pure transform, so photos are moved by

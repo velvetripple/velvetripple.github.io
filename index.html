@@ -55,7 +55,10 @@
         background:var(--pg); color:var(--pfg);
         font-family:var(--font-body);
         -webkit-font-smoothing:antialiased;
-        transition:background-color var(--clim-dur,1.4s) ease, color var(--clim-dur,1.4s) ease;
+        /* the GROUND colour is not transitioned here — .ground crossfades it
+           on the compositor, scroll-linked. this rule only paints the canvas
+           behind the overscroll rubber-band, so it eases slowly and cheaply. */
+        transition:background-color .9s linear, color var(--clim-dur,.45s) ease;
         overflow-x:hidden; }
   body[data-climate="teal"]{ --pg:#2B4549; --pfg:#EFE7D6;
         --pfg2:rgba(239,231,214,.66); --pfg3:rgba(239,231,214,.46);
@@ -65,6 +68,28 @@
         --pfg2:rgba(239,231,214,.62); --pfg3:rgba(239,231,214,.44);
         --prule:rgba(239,231,214,.16);
         --mis-a:rgba(107,30,26,.55); --mis-b:rgba(217,162,75,.16); --halo:rgba(217,162,75,.15); }
+
+  /* ---- the ground ---------------------------------------------
+     the page colour used to be `transition:background-color` on <body>,
+     which repaints the whole viewport on every frame of the fade — and
+     the three fixed plates above it (.vig, .stock soft-light, .grain
+     multiply) all have to re-blend against each of those repaints.
+
+     instead: one solid pane per climate, stacked, crossfaded by OPACITY
+     alone. opacity on a solid fixed layer is a compositor property, so
+     the recolour costs no paint at all. the scroll engine drives the
+     opacities straight from scrollY, so the colour tracks the scroll
+     instead of easing in 1.4s behind it. panes are built by JS from the
+     [data-climate] sections, in document order. */
+  .ground{ position:fixed; inset:0; z-index:-1; pointer-events:none;
+    contain:layout paint style; }
+  .ground i{ position:absolute; inset:0; opacity:0; }
+  /* the first pane is the base and never animates — only the ones that
+     wipe in over it need a compositor layer */
+  .ground i + i{ will-change:opacity; }
+  .ground .g-bone{ background:#EFE7D6; }
+  .ground .g-teal{ background:#2B4549; }
+  .ground .g-ink{  background:#161311; }
 
   a{ color:inherit; text-decoration:none; }
   ::selection{ background:#6B1E1A; color:#EFE7D6; }
@@ -76,7 +101,7 @@
 
   .mono{ font-family:var(--font-mono); font-size:11px; letter-spacing:.16em;
          text-transform:uppercase; color:var(--pfg3);
-         transition:color var(--clim-dur,1.4s) ease; }
+         transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
 
   /* the liquid — the melt filter drives DISPLAY TYPE ONLY. photos are
      moved by the compositor (transforms), never re-rasterized. */
@@ -86,7 +111,7 @@
     background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='210' height='210'%3E%3Cfilter id='v'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.5 0.04' numOctaves='3' seed='9' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23v)' opacity='0.32'/%3E%3C/svg%3E"),
       linear-gradient(115deg, rgba(217,162,75,0) 40%, rgba(217,162,75,.2) 50%, rgba(217,162,75,0) 60%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
-    transition:background-color var(--clim-dur,1.4s) ease; }
+    transition:background-color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   .velvet-word{ filter:url(#vr-liquid); will-change:filter; }
 
   /* ---- material plates ----------------------------------------
@@ -129,7 +154,7 @@
       var(--misx,1.2px) 0 0 var(--mis-a),
       calc(-1 * var(--misx,1.2px)) 0 0 var(--mis-b),
       0 0 30px var(--halo);
-    transition:text-shadow var(--clim-dur,1.4s) ease; }
+    transition:text-shadow var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
 
   /* v2 · film rebate — photos sit in negative frames w/ edge markings */
   .film{ position:relative; border:5px solid #14100D;
@@ -144,10 +169,10 @@
     display:flex; flex-direction:column; gap:2px; pointer-events:none; }
   .tape .tc-count{ font-family:var(--font-mono); font-size:13px; letter-spacing:.3em;
     color:var(--pfg2); font-variant-numeric:tabular-nums;
-    transition:color var(--clim-dur,1.4s) ease; }
+    transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   .tape .tc-sub{ font-family:var(--font-mono); font-size:8.5px; letter-spacing:.2em;
     text-transform:uppercase; color:var(--pfg3);
-    transition:color var(--clim-dur,1.4s) ease; }
+    transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   body[data-tape="off"] .tape{ display:none; }
 
   /* v4 · indie psychedelia — the liquid light show.
@@ -187,7 +212,7 @@
 
   /* v4 · psych photo grade — deepens with the climate, set once per
      climate change (never per frame) */
-  .film img{ transition:filter var(--clim-dur,1.4s) ease; }
+  .film img{ transition:filter var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   body[data-climate="teal"] .film img{ filter:saturate(.82) contrast(1.09) sepia(.12) hue-rotate(-6deg); }
   body[data-climate="ink"] .film img{ filter:saturate(.72) contrast(1.14) sepia(.2) hue-rotate(-12deg) brightness(.94); }
 
@@ -244,7 +269,7 @@
     .hero-word{ animation:vrBreathe 9s ease-in-out infinite; } }
   .hero-sub{ font-family:var(--font-display); font-style:italic;
        font-size:clamp(1rem,1.6vw,1.3rem); color:var(--pfg2);
-       transition:color var(--clim-dur,1.4s) ease; }
+       transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   .hero-strip{ width:min(560px,82vw); aspect-ratio:21/9; overflow:hidden; }
   .hero-strip img{ width:100%; height:100%; object-fit:cover; display:block;
        filter:saturate(.9) contrast(1.05) sepia(.07); }
@@ -252,7 +277,7 @@
        width:96px; height:96px; display:grid; place-items:center; }
   .cue-ring{ position:absolute; inset:0; overflow:visible; animation:cueSpin 28s linear infinite; }
   .cue-ring text{ font-family:var(--font-mono); font-size:8px; letter-spacing:.28em;
-       text-transform:uppercase; fill:var(--pfg3); transition:fill var(--clim-dur,1.4s) ease; }
+       text-transform:uppercase; fill:var(--pfg3); transition:fill var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   .cue-arrow{ font-family:var(--font-mono); font-size:12px; color:var(--pfg2);
        animation:cuePulse 3.2s ease-in-out infinite; }
   @keyframes cueSpin{ to{ transform:rotate(360deg); } }
@@ -264,7 +289,7 @@
   .thesis-line{ font-family:var(--font-display); font-style:italic; font-weight:400;
        font-size:clamp(1.8rem,4.2vw,3.3rem); line-height:1.25; max-width:22ch; }
   .thesis-sub{ font-family:var(--font-body); font-size:.95rem; color:var(--pfg2);
-       transition:color var(--clim-dur,1.4s) ease; }
+       transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
 
   /* ---------- 3 · FORMING ---------- */
   .forming{ min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
@@ -281,7 +306,7 @@
   /* tracklist — present, six rows, none of it legible yet. the rows carry word LENGTHS
      only: no titles exist in the markup, so there is nothing to read in the source either. */
   .tracklist{ list-style:none; display:flex; flex-direction:column; gap:11px; margin-top:22px;
-       max-width:32ch; color:var(--pfg2); transition:color var(--clim-dur,1.4s) ease; }
+       max-width:32ch; color:var(--pfg2); transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   .tracklist li{ display:flex; align-items:center; gap:11px; }
   .tracklist .tn{ font-size:.72rem; letter-spacing:.2em; opacity:.5; flex:none; }
   .tracklist .tw{ height:.58em; width:var(--w,20%); background:currentColor; opacity:.3;
@@ -305,7 +330,7 @@
        60%{ filter:blur(1.2px); opacity:.7; } to{ filter:blur(0); opacity:1; } }
   .tracknote{ display:block; margin-top:14px; max-width:32ch; text-transform:none;
        font-size:.68rem; letter-spacing:.16em; line-height:1.85;
-       color:var(--pfg2); opacity:.6; transition:color var(--clim-dur,1.4s) ease; }
+       color:var(--pfg2); opacity:.6; transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
 
   /* the door — a dial plate, dusted with static until you tune it in */
   .tunein{ position:relative; align-self:flex-start; margin-top:22px; display:inline-flex;
@@ -339,7 +364,7 @@
        font-size:clamp(2.2rem,4.6vw,3.8rem); line-height:1.05; }
   .forming-it{ font-family:var(--font-display); font-style:italic;
        font-size:1.1rem; line-height:1.6; color:var(--pfg2); max-width:34ch;
-       transition:color var(--clim-dur,1.4s) ease; }
+       transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   .forming-meta{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
   /* the one door to the frequency room — never explained */
   .forming-link{ align-self:flex-start; margin-top:16px; letter-spacing:.24em;
@@ -360,7 +385,7 @@
   .fnote img{ width:100%; height:100%; object-fit:cover; display:block;
        filter:saturate(.88) contrast(1.06) sepia(.07); }
   .fnote-cap{ font-family:var(--font-body); font-size:.92rem; line-height:1.65;
-       color:var(--pfg2); max-width:30ch; transition:color var(--clim-dur,1.4s) ease; }
+       color:var(--pfg2); max-width:30ch; transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
 
   /* ---------- 5 · THE WORD ---------- */
   .word{ min-height:100vh; display:flex; flex-direction:column; align-items:center;
@@ -374,7 +399,7 @@
   .letter-title{ font-family:var(--font-display); font-weight:400;
        font-size:clamp(2rem,4vw,3.2rem); line-height:1; }
   .letter-copy{ font-family:var(--font-body); font-size:.98rem; line-height:1.7;
-       color:var(--pfg2); max-width:44ch; transition:color var(--clim-dur,1.4s) ease; }
+       color:var(--pfg2); max-width:44ch; transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
   .letter-form{ display:flex; width:min(440px,86vw); border-bottom:1px solid var(--pfg2);
        margin-top:14px; transition:border-color var(--dur-hover,400ms) ease; }
   .letter-form:focus-within{ border-bottom-color:var(--vr-honey); }

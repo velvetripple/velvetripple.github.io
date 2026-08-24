@@ -1,0 +1,4 @@
+# supabase cli local state — machine-specific, not part of the site
+supabase/.temp/
+
+.DS_Store
