@@ -127,7 +127,7 @@ begin
     -- nothing useful — it does not help anyone guess the passphrase.
     raise exception 'moderator key not configured';
   end if;
-  if encode(digest(p_key, 'sha256'), 'hex') is distinct from v_expect then
+  if encode(digest(btrim(coalesce(p_key, '')), 'sha256'), 'hex') is distinct from v_expect then
     perform pg_sleep(0.5);              -- blunt the guessing rate
     return false;
   end if;
@@ -147,7 +147,12 @@ create or replace function public.comms_set_mod_key(p_key text)
 returns text
 language plpgsql security definer set search_path = public, extensions as $$
 begin
-  if p_key is null or char_length(p_key) < 12 then
+  -- trim on the way in, and identically on the way out in
+  -- comms_delete_mod. pasting a passphrase from a password manager very
+  -- often brings a trailing space, and the page trims what you type —
+  -- so without this the two sides could disagree invisibly forever.
+  p_key := btrim(coalesce(p_key, ''));
+  if char_length(p_key) < 12 then
     raise exception 'pick a longer passphrase (12 characters minimum)';
   end if;
   insert into public.comms_secret (k, v)
@@ -156,18 +161,37 @@ begin
   return 'moderator key set';
 end $$;
 
+-- ---------- check a passphrase without deleting anything -------------
+-- for YOU, in the dashboard or the cli. deliberately NOT granted to
+-- anon: exposing this to the internet would hand out a free oracle to
+-- brute-force the key against.
+create or replace function public.comms_check_mod_key(p_key text)
+returns text
+language plpgsql security definer set search_path = public, extensions as $$
+declare v_expect text;
+begin
+  select v into v_expect from public.comms_secret where k = 'mod';
+  if v_expect is null then return 'NO KEY IS SET — run comms_set_mod_key first'; end if;
+  if encode(digest(btrim(coalesce(p_key, '')), 'sha256'), 'hex') = v_expect
+    then return 'MATCH — this is the passphrase the site expects';
+    else return 'NO MATCH — the stored key is something else';
+  end if;
+end $$;
+
 -- ---------- grants --------------------------------------------------
 revoke all on function public.comms_post(text, text, text)  from public;
 revoke all on function public.comms_delete_own(uuid, text)   from public;
 revoke all on function public.comms_delete_mod(uuid, text)   from public;
 revoke all on function public.comms_set_mod_key(text)        from public;
+revoke all on function public.comms_check_mod_key(text)      from public;
 
 grant execute on function public.comms_post(text, text, text) to anon, authenticated;
 grant execute on function public.comms_delete_own(uuid, text)  to anon, authenticated;
 grant execute on function public.comms_delete_mod(uuid, text)  to anon, authenticated;
 
--- the key-setter stays out of the website's reach entirely
-revoke all on function public.comms_set_mod_key(text) from anon, authenticated;
+-- the key-setter and the key-checker stay out of the website's reach
+revoke all on function public.comms_set_mod_key(text)   from anon, authenticated;
+revoke all on function public.comms_check_mod_key(text) from anon, authenticated;
 
 
 -- ===================================================================
