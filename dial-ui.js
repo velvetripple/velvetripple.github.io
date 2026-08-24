@@ -131,39 +131,319 @@
     return el;
   }
 
-  // ---------- comms ----------
+  // ---------- comms ---------------------------------------------------
+  /* the logbook is PUBLIC: every visitor sees every transmission. that
+     needs a server, so the lines live in a supabase table (see
+     supabase-setup.sql) reached over plain fetch — no sdk, nothing on a
+     cdn, so the page stays self-contained.
+
+     with comms-config.js left blank this degrades to browser-local
+     storage: everything below still works, lines still persist and still
+     delete, they just never leave the machine that wrote them.
+
+     two people can delete a line: whoever wrote it, and you. neither is
+     enforced here — the × is only ever a request. postgres checks the
+     secret and decides. see the security-definer functions in the sql. */
+  const CFG = window.VR_COMMS || {};
+  const API = String(CFG.url || '').replace(/\/+$/, '');
+  const REMOTE = !!(API && CFG.key);
+  const POLL = Math.max(5, +CFG.poll || 20) * 1000;
+
+  // the delete credential. random, kept only in this browser, and sent
+  // to the server which stores nothing but its sha256.
+  if (!store.token || store.token.length < 24) { store.token = mkToken(); save(); }
+  function mkToken() {
+    try { return crypto.randomUUID().replace(/-/g, '') + crypto.randomUUID().replace(/-/g, ''); }
+    catch (e) { return String(Date.now()) + String(Math.random()).slice(2) + String(Math.random()).slice(2); }
+  }
+  store.mine = store.mine || [];      // ids of lines written from this browser
+  store.local = store.local || [];    // the no-backend fallback logbook
+
+  let modKey = '';                    // moderator passphrase, this tab only
+  try { modKey = sessionStorage.getItem('vr.mod') || ''; } catch (e) {}
+
+  function api(path, body) {
+    return fetch(API + path, {
+      method: body ? 'POST' : 'GET',
+      headers: {
+        apikey: CFG.key,
+        Authorization: 'Bearer ' + CFG.key,
+        'Content-Type': 'application/json'
+      },
+      body: body ? JSON.stringify(body) : undefined
+    });
+  }
+
+  /* system lines — the seeded fiction and the acquisition notices. these
+     are ours, never a stranger's, so the template literal is safe here. */
   function logLine(ts, who, text, cls) {
     const el = document.createElement('div');
     el.className = 'line ' + (cls || '');
     el.innerHTML = `<span class="ts">${ts}</span><span class="body">${who ? '<span class="cs">' + who + '</span> · ' : ''}${text}</span>`;
     clog.appendChild(el);
-    clog.scrollTop = clog.scrollHeight;
+    if (pinned()) clog.scrollTop = clog.scrollHeight;
     return el;
   }
+
+  /* transmissions — written by strangers, so EVERY field goes in as a
+     text node. never innerHTML down this path: one `<img onerror>` in a
+     callsign and the logbook is running someone else's javascript. */
+  function commLine(rec) {
+    const el = document.createElement('div');
+    el.className = 'line comm' + (isMine(rec.id) ? ' mine' : '');
+    el.dataset.commId = rec.id;
+
+    const ts = document.createElement('span');
+    ts.className = 'ts';
+    ts.textContent = rec.ts || tsOf(rec.created_at);
+
+    const body = document.createElement('span');
+    body.className = 'body';
+    const cs = document.createElement('span');
+    cs.className = 'cs';
+    cs.textContent = rec.callsign;
+    body.appendChild(cs);
+    body.appendChild(document.createTextNode(' · ' + rec.body));
+
+    el.appendChild(ts);
+    el.appendChild(body);
+    fitControls(el, rec);
+    return el;
+  }
+
+  function fitControls(el, rec) {
+    const want = isMine(rec.id) || !!modKey;
+    const has = el.querySelector('.del');
+    if (want && !has) {
+      const b = document.createElement('button');
+      b.className = 'del';
+      b.type = 'button';
+      b.title = isMine(rec.id) ? 'remove your transmission' : 'remove this transmission';
+      b.setAttribute('aria-label', b.title);
+      b.textContent = '×';
+      b.addEventListener('click', () => removeComm(rec.id, el));
+      el.appendChild(b);
+    } else if (!want && has) {
+      has.remove();
+    }
+    el.classList.toggle('mine', isMine(rec.id));
+  }
+
+  const isMine = (id) => store.mine.indexOf(id) >= 0;
+  const tsOf = (iso) => {
+    const d = iso ? new Date(iso) : new Date();
+    return ['04', String(d.getDate()).padStart(2, '0'),
+      String(d.getHours()).padStart(2, '0'),
+      String(d.getMinutes()).padStart(2, '0')].join(' ');
+  };
+  function stamp() { return tsOf(null); }
+
+  // is the log scrolled to the bottom? if the reader has scrolled up to
+  // read something, a new line must not yank them back down.
+  function pinned() { return clog.scrollHeight - clog.scrollTop - clog.clientHeight < 24; }
+  function updateCount() { $('#tuned').textContent = 'logbook · ' + clog.children.length + ' lines'; }
+
   SEED.forEach(([ts, who, text, cls]) => logLine(ts, who, text, cls));
-  if (store.msg) logLine(store.ts || stamp(), store.callsign, store.msg, 'mine');
-  $('#tuned').textContent = 'logbook · ' + clog.children.length + ' lines';
-  function stamp() {
-    const d = new Date();
-    return ['04', String(d.getDate()).padStart(2, '0'), String(d.getHours()).padStart(2, '0'), String(d.getMinutes()).padStart(2, '0')].join(' ');
+  updateCount();
+
+  /* the old build let you post exactly one line, stored only in your own
+     browser under store.msg. it was never public and there is no honest
+     way to publish it now on that person's behalf — so it is handed back
+     to them in the input instead of being silently dropped. */
+  if (store.msg && !store.mine.length && !store.local.length) {
+    cinput.value = store.msg;
+    delete store.msg; delete store.ts; save();
   }
-  function transmit() {
-    const v = cinput.value.trim();
-    if (!v || store.msg) return;
-    store.msg = v.slice(0, 80); store.ts = stamp(); save();
-    logLine(store.ts, store.callsign, store.msg, 'mine');
-    cinput.value = ''; lockInput();
-    $('#tuned').textContent = 'logbook · ' + clog.children.length + ' lines';
+
+  // ---------- render ---------------------------------------------------
+  function render(rows) {
+    const seen = Object.create(null);
+    rows.forEach((r) => { seen[r.id] = r; });
+
+    // drop anything that has been removed at the source
+    Array.prototype.forEach.call(clog.querySelectorAll('[data-comm-id]'), (el) => {
+      if (!seen[el.dataset.commId]) {
+        if (isMine(el.dataset.commId)) {
+          store.mine.splice(store.mine.indexOf(el.dataset.commId), 1); save();
+        }
+        el.remove();
+      }
+    });
+
+    const stick = pinned();
+    rows.forEach((rec) => {
+      const el = clog.querySelector('[data-comm-id="' + cssId(rec.id) + '"]');
+      if (el) fitControls(el, rec);
+      else clog.appendChild(commLine(rec));
+    });
+    if (stick) clog.scrollTop = clog.scrollHeight;
+    updateCount();
+    lockInput();
   }
+  const cssId = (s) => (window.CSS && CSS.escape) ? CSS.escape(s) : String(s).replace(/["\\]/g, '\\$&');
+
+  async function refresh() {
+    if (!REMOTE) { render(store.local); return; }
+    try {
+      const r = await api('/rest/v1/comms_public?select=id,created_at,callsign,body&order=created_at.asc&limit=200');
+      if (!r.ok) throw new Error('http ' + r.status);
+      render(await r.json());
+      note('');
+    } catch (e) {
+      // offline or misconfigured — keep whatever is already on screen
+      note('channel down · retrying');
+    }
+  }
+
+  function note(msg) {
+    if (msg) { cspent.textContent = msg; cspent.classList.add('warn'); return; }
+    cspent.classList.remove('warn');
+    lockInput();
+  }
+
+  // ---------- transmit -------------------------------------------------
+  let busy = false;
+  async function transmit() {
+    const v = cinput.value.trim().slice(0, 80);
+    if (!v || busy || myLine()) return;
+    busy = true; csend.disabled = true; note('transmitting…');
+
+    if (!REMOTE) {
+      const rec = { id: 'local-' + mkToken().slice(0, 12), ts: stamp(),
+                    callsign: store.callsign, body: v };
+      store.local.push(rec); store.mine.push(rec.id); save();
+      cinput.value = ''; render(store.local);
+      busy = false; csend.disabled = false; return;
+    }
+
+    try {
+      const r = await api('/rest/v1/rpc/comms_post', {
+        p_callsign: store.callsign, p_body: v, p_token: store.token
+      });
+      const raw = await r.text();
+      if (!r.ok) throw new Error(reason(raw, r.status));
+      const id = JSON.parse(raw);
+      store.mine.push(id); save();
+      cinput.value = '';
+      await refresh();
+    } catch (e) {
+      note(String(e.message || e));
+    } finally {
+      busy = false; csend.disabled = false;
+    }
+  }
+
+  // postgres raises text like 'already logged'; surface that, not a 400.
+  function reason(raw, status) {
+    try {
+      const j = JSON.parse(raw);
+      const m = j.message || j.error || j.hint || '';
+      if (/already logged/i.test(m)) return 'you have already transmitted';
+      if (/channel busy/i.test(m)) return 'channel busy · try again shortly';
+      if (/bad token/i.test(m)) return 'this browser cannot transmit';
+      if (/comms_callsign_check|comms_body_check|violates check/i.test(m)) return 'that line will not go out';
+      return m || ('transmit failed · ' + status);
+    } catch (e) { return 'transmit failed · ' + status; }
+  }
+
+  const myLine = () => clog.querySelector('[data-comm-id].mine');
+
   function lockInput() {
-    if (!store.msg) return;
-    cinput.disabled = true; cinput.placeholder = 'one line, once.';
-    csend.style.display = 'none';
-    cspent.textContent = 'logged · ' + store.callsign;
+    const mine = myLine();
+    if (mine) {
+      cinput.disabled = true;
+      cinput.value = '';
+      cinput.placeholder = 'one line, once.';
+      csend.style.display = 'none';
+      cspent.textContent = 'logged · ' + store.callsign + ' · × to withdraw';
+    } else {
+      cinput.disabled = false;
+      cinput.placeholder = 'one line, once.';
+      csend.style.display = '';
+      cspent.textContent = '';
+    }
   }
+
+  // ---------- remove ---------------------------------------------------
+  async function removeComm(id, el) {
+    if (busy) return;
+    const mine = isMine(id);
+    if (!mine && !modKey) return;
+    busy = true;
+    el.classList.add('going');
+
+    if (!REMOTE) {
+      store.local = store.local.filter((r) => r.id !== id);
+      if (mine) store.mine.splice(store.mine.indexOf(id), 1);
+      save(); render(store.local); busy = false; return;
+    }
+
+    try {
+      const r = await api(mine ? '/rest/v1/rpc/comms_delete_own' : '/rest/v1/rpc/comms_delete_mod',
+        mine ? { p_id: id, p_token: store.token } : { p_id: id, p_key: modKey });
+      if (!r.ok) throw new Error('http ' + r.status);
+      const ok = await r.json();
+      if (!ok) {
+        // the server refused: wrong moderator key, or the line is gone
+        el.classList.remove('going');
+        note(mine ? 'could not withdraw that line' : 'moderator key refused');
+        busy = false;
+        return;
+      }
+      if (mine) store.mine.splice(store.mine.indexOf(id), 1);
+      save();
+      busy = false;
+      await refresh();
+    } catch (e) {
+      el.classList.remove('going');
+      note('could not reach the channel');
+      busy = false;
+    }
+  }
+
+  // ---------- moderator ------------------------------------------------
+  /* armed by loading the page with ?mod — that only reveals the field,
+     it grants nothing. the passphrase is checked inside postgres, and it
+     is never written to disk here: sessionStorage dies with the tab. */
+  const cmod = $('#cmod');
+  if (cmod && (/[?&]mod\b/.test(location.search) || modKey)) {
+    cmod.hidden = false;
+    if (modKey) $('#cmodkey').value = '••••••••';
+    $('#cmodgo').addEventListener('click', armMod);
+    $('#cmodkey').addEventListener('keydown', (e) => { if (e.key === 'Enter') armMod(); });
+  }
+  function armMod() {
+    const v = $('#cmodkey').value.trim();
+    if (!v || v === '••••••••') { modKey = ''; }
+    else { modKey = v; }
+    try { modKey ? sessionStorage.setItem('vr.mod', modKey) : sessionStorage.removeItem('vr.mod'); } catch (e) {}
+    $('#cmodkey').value = modKey ? '••••••••' : '';
+    cmod.dataset.on = modKey ? '1' : '';
+    // the key is not verified until a delete is actually attempted —
+    // there is deliberately no "check my password" endpoint to hammer.
+    Array.prototype.forEach.call(clog.querySelectorAll('[data-comm-id]'), (el) => {
+      fitControls(el, { id: el.dataset.commId });
+    });
+  }
+  if (modKey && cmod) cmod.dataset.on = '1';
+
+  // ---------- wiring ---------------------------------------------------
   csend.addEventListener('click', transmit);
   cinput.addEventListener('keydown', (e) => { if (e.key === 'Enter') transmit(); });
   lockInput();
+  refresh();
+
+  let pollT = 0;
+  function poll(on) {
+    clearInterval(pollT);
+    if (on && REMOTE) pollT = setInterval(refresh, POLL);
+  }
+  poll(true);
+  document.addEventListener('visibilitychange', () => {
+    poll(!document.hidden);
+    if (!document.hidden) refresh();
+  });
+
   $('#commstab').addEventListener('click', () => {
     body.dataset.comms = body.dataset.comms === 'open' ? 'closed' : 'open';
   });
@@ -273,7 +553,7 @@
       memorize(s.f);
       logLine(stamp(), '', s.f.toFixed(1) + ' · ' + s.label + ' · acquired', 'acq');
       (store.locks = store.locks || []).indexOf(s.id) < 0 && store.locks.push(s.id); save();
-      $('#tuned').textContent = 'logbook · ' + clog.children.length + ' lines';
+      updateCount();
       burst(s, 5);
       if (Object.keys(locked).length === STATIONS.length && !finaleQueued) { finaleQueued = true; setTimeout(finale, 7600); }
     }, delay);
@@ -463,7 +743,7 @@
       s.el.classList.add('found');
       hintStamp(s, keep, q);
       logLine(stamp(), '', s.f.toFixed(1) + ' · stray · logged', 'acq');
-      $('#tuned').textContent = 'logbook · ' + clog.children.length + ' lines';
+      updateCount();
       (store.secrets = store.secrets || []).push({ f: s.f, q }); save();
       revealing = false;
     }, outAt + 1100);
