@@ -3,9 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>velvet ripple</title>
+<title>Velvet Ripple — Indie Psychedelia from Phoenix, Arizona</title>
+<meta name="description" content="Indie psychedelia from Phoenix, Arizona — analog, nocturnal, tape-first, made for the in-between hour. Debut single Frequency out September 4, 2026.">
+<link rel="canonical" href="https://velvetripple.art/">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
+<meta name="theme-color" content="#161311">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Velvet Ripple">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://velvetripple.art/">
+<meta property="og:title" content="Velvet Ripple — Indie Psychedelia from Phoenix, Arizona">
+<meta property="og:description" content="Analog, nocturnal, tape-first. Music for the in-between hour. Debut single Frequency out September 4, 2026.">
+<meta property="og:image" content="https://velvetripple.art/assets/og/velvet-ripple-og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Velvet Ripple wordmark in bone on an inkwell ground.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Velvet Ripple — Indie Psychedelia from Phoenix, Arizona">
+<meta name="twitter:description" content="Analog, nocturnal, tape-first. Music for the in-between hour. Debut single Frequency out September 4, 2026.">
+<meta name="twitter:image" content="https://velvetripple.art/assets/og/velvet-ripple-og.png">
+<meta name="twitter:image:alt" content="The Velvet Ripple wordmark in bone on an inkwell ground.">
+<link rel="me" href="https://instagram.com/velvet.ripple">
+<link rel="me" href="https://www.threads.com/@velvet.ripple">
 <link rel="icon" href="assets/velvet-ripple-favicon.png">
+<link rel="preload" href="fonts/Gloock-Regular.ttf" as="font" type="font/ttf" crossorigin>
 <link rel="stylesheet" href="colors_and_type.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"MusicGroup","@id":"https://velvetripple.art/#artist","name":"Velvet Ripple","alternateName":"velvet ripple","url":"https://velvetripple.art/","mainEntityOfPage":"https://velvetripple.art/","description":"Velvet Ripple is a solo indie psychedelia project based in Phoenix, Arizona. Analog and nocturnal — songs written and recorded to tape for the in-between hour. Debut single Frequency arrives September 4, 2026.","disambiguatingDescription":"Indie psychedelia project from Phoenix, Arizona, catalogued VR — 001. Distinct from other recording artists sharing the name Velvet Ripple.","genre":["Indie psychedelia","Psychedelic pop","Experimental pop","Bedroom pop"],"foundingDate":"2026","foundingLocation":{"@type":"Place","name":"Phoenix, Arizona","address":{"@type":"PostalAddress","addressLocality":"Phoenix","addressRegion":"AZ","addressCountry":"US"}},"image":"https://velvetripple.art/assets/og/velvet-ripple-og.png","logo":"https://velvetripple.art/assets/velvet-ripple-mark.svg","sameAs":["https://instagram.com/velvet.ripple","https://www.threads.com/@velvet.ripple"],"track":{"@id":"https://velvetripple.art/#frequency"}},
+{"@type":"MusicRecording","@id":"https://velvetripple.art/#frequency","name":"Frequency","byArtist":{"@id":"https://velvetripple.art/#artist"},"datePublished":"2026-09-04","duration":"PT3M36S","inLanguage":"en","genre":"Indie psychedelia","description":"Debut single from Velvet Ripple. Nocturnal indie synth-pop, 108 BPM, recorded in Phoenix, Arizona."},
+{"@type":"WebSite","@id":"https://velvetripple.art/#website","url":"https://velvetripple.art/","name":"Velvet Ripple","inLanguage":"en","publisher":{"@id":"https://velvetripple.art/#artist"}}]}
+</script>
 <style>
   /* ============================================================
      VELVET RIPPLE — Liquid Velvet site · v4
@@ -184,7 +212,7 @@
   .warp{ filter:url(#vr-warp); }
 
   @media (prefers-reduced-motion: reduce){
-    .oil, .oil i, .rings i, .cue-ring{ animation:none !important; } }
+    .oil, .oil i, .rings i, .cue-ring, .tunein .tune-static, .tunein::after{ animation:none !important; } }
 
   /* nav */
   nav{ position:fixed; top:0; left:0; right:0; z-index:40;
@@ -242,9 +270,69 @@
   .forming{ min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
        align-items:center; gap:60px; padding:120px 64px; max-width:1280px; margin:0 auto; }
   .forming-art{ position:relative; aspect-ratio:1/1; overflow:hidden; background:#1E1A17; }
+  /* the cover is in the room but hasn't taken shape — the melt is baked into the file,
+     not applied here, so devtools can't undo it and read the art early. the softening lives
+     on a wrapper so it COMPOSES with the .film climate grade instead of losing to it. */
+  .forming-art .unformed{ position:absolute; inset:0; filter:blur(9px) url(#vr-melt); }
   .forming-art img{ position:absolute; inset:-8%; width:116%; height:116%; object-fit:cover;
-       filter:blur(16px) saturate(1.05) contrast(1.05); transform:scale(1.06); }
+       transform:scale(1.06); }
   .forming-art .veil{ position:absolute; inset:0; background:rgba(22,19,17,.22); }
+
+  /* tracklist — present, six rows, none of it legible yet. the rows carry word LENGTHS
+     only: no titles exist in the markup, so there is nothing to read in the source either. */
+  .tracklist{ list-style:none; display:flex; flex-direction:column; gap:11px; margin-top:22px;
+       max-width:32ch; color:var(--pfg2); transition:color var(--clim-dur,1.4s) ease; }
+  .tracklist li{ display:flex; align-items:center; gap:11px; }
+  .tracklist .tn{ font-size:.72rem; letter-spacing:.2em; opacity:.5; flex:none; }
+  .tracklist .tw{ height:.58em; width:var(--w,20%); background:currentColor; opacity:.3;
+       border-radius:1.5px; }
+  .tracklist li:nth-child(even) .tw{ height:.52em; opacity:.26; }
+  /* each row sat in the developer a little differently */
+  .tracklist li:nth-child(2) .smear{ translate:2px 1px; }
+  .tracklist li:nth-child(3) .smear{ translate:-3px 0; opacity:.86; }
+  .tracklist li:nth-child(4) .smear{ translate:4px -1px; opacity:.78; }
+  .tracklist li:nth-child(5) .smear{ translate:-1px 1px; opacity:.7; }
+  .tracklist li:nth-child(6) .smear{ translate:3px 0; opacity:.62; }
+  .tracklist .smear{ display:flex; align-items:baseline; gap:7px; flex:1; filter:url(#vr-melt) blur(2.9px); }
+  /* one track develops once the room has been solved — the rest stay on the shelf */
+  .tracklist .tt{ display:none; }
+  .tracklist li.clear .smear{ display:none; }
+  .tracklist li.clear .tt{ display:inline; color:var(--vr-honey); opacity:1;
+       text-transform:none; font-size:.8rem; letter-spacing:.16em;
+       animation:trackDevelop 2.6s ease both .5s; }
+  .tracklist li.clear .tn{ opacity:.85; }
+  @keyframes trackDevelop{ from{ filter:blur(7px); opacity:0; }
+       60%{ filter:blur(1.2px); opacity:.7; } to{ filter:blur(0); opacity:1; } }
+  .tracknote{ display:block; margin-top:14px; max-width:32ch; text-transform:none;
+       font-size:.68rem; letter-spacing:.16em; line-height:1.85;
+       color:var(--pfg2); opacity:.6; transition:color var(--clim-dur,1.4s) ease; }
+
+  /* the door — a dial plate, dusted with static until you tune it in */
+  .tunein{ position:relative; align-self:flex-start; margin-top:22px; display:inline-flex;
+       align-items:center; gap:12px; padding:11px 16px; letter-spacing:.24em; overflow:hidden;
+       color:var(--vr-honey); border:1px solid rgba(217,162,75,.3); background:rgba(217,162,75,.05);
+       transition:border-color var(--dur-hover,.5s) ease, background var(--dur-hover,.5s) ease; }
+  .tunein .tune-static{ position:absolute; inset:-40%; pointer-events:none; opacity:.55;
+       mix-blend-mode:overlay; background-repeat:repeat;
+       background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23s)' opacity='.6'/%3E%3C/svg%3E");
+       animation:tuneHiss .42s steps(3) infinite, tuneDrift 9s linear infinite;
+       transition:opacity var(--dur-hover,.5s) ease; }
+  /* tape tracking — one bright line crawls the plate every few seconds */
+  .tunein::after{ content:""; position:absolute; left:0; right:0; height:2px;
+       background:linear-gradient(90deg,transparent,rgba(239,231,214,.5),transparent);
+       animation:tuneTrack 7.5s linear infinite; pointer-events:none; }
+  .tunein .tune-t{ position:relative; text-shadow:0 0 12px rgba(217,162,75,.35);
+       transition:letter-spacing var(--dur-hover,.5s) ease, text-shadow var(--dur-hover,.5s) ease; }
+  .tunein .tune-ar{ position:relative; opacity:.6; transition:opacity var(--dur-hover,.5s) ease, translate var(--dur-hover,.5s) ease; }
+  .tunein:hover{ color:var(--vr-honey); border-color:rgba(217,162,75,.7); background:rgba(217,162,75,.1); }
+  .tunein:hover .tune-static{ opacity:.12; }          /* it comes in clear */
+  .tunein:hover .tune-t{ letter-spacing:.28em; text-shadow:0 0 18px rgba(217,162,75,.6); }
+  .tunein:hover .tune-ar{ opacity:1; translate:3px 0; }
+  @keyframes tuneHiss{ 0%{ transform:translate3d(0,0,0); } 33%{ transform:translate3d(-3%,2%,0); }
+       66%{ transform:translate3d(2%,-3%,0); } 100%{ transform:translate3d(-1%,-1%,0); } }
+  @keyframes tuneDrift{ from{ background-position:0 0; } to{ background-position:120px 90px; } }
+  @keyframes tuneTrack{ 0%,82%{ top:-4px; opacity:0; } 84%{ opacity:.9; }
+       97%{ top:100%; opacity:.5; } 100%{ top:100%; opacity:0; } }
   .forming-art .stamp{ position:absolute; left:18px; bottom:16px; z-index:2; }
   .forming-copy{ display:flex; flex-direction:column; gap:18px; }
   .forming-title{ font-family:var(--font-display); font-weight:400;
@@ -253,6 +341,11 @@
        font-size:1.1rem; line-height:1.6; color:var(--pfg2); max-width:34ch;
        transition:color var(--clim-dur,1.4s) ease; }
   .forming-meta{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
+  /* the one door to the frequency room — never explained */
+  .forming-link{ align-self:flex-start; margin-top:16px; letter-spacing:.24em;
+       border-bottom:1px solid rgba(217,162,75,.4); padding-bottom:3px;
+       transition:color var(--dur-hover,.5s) ease, border-color var(--dur-hover,.5s) ease; }
+  .forming-link:hover{ color:var(--vr-honey); border-bottom-color:var(--vr-honey); }
 
   /* ---------- 4 · FIELD NOTES ---------- */
   .field{ padding:130px 64px 150px; max-width:1280px; margin:0 auto; }
@@ -347,6 +440,8 @@
   <a class="lnk" href="#letter">letter</a>
 </nav>
 
+<svg width="0" height="0" aria-hidden="true" style="position:absolute"><filter id="vr-melt" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.009 0.042" numOctaves="2" seed="7" result="n"></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="13" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap></filter></svg>
+
 <!-- 1 · HERO -->
 <section class="hero lit" id="top" data-climate="bone" data-screen-label="hero">
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
@@ -355,7 +450,7 @@
   <h1 class="hero-word velvet-word misreg">velvet<br>ripple</h1>
   <p class="hero-sub">the in-between hour, recorded.</p>
   <div class="hero-strip film" data-plx="22">
-    <img src="assets/photos/williams-drive.png" alt="dusk highway west of williams, arizona">
+    <img src="assets/photos/williams-drive.png" alt="Dusk on the highway west of Williams, Arizona — a Velvet Ripple field photograph">
     <span class="rebate">vr–400 ▸ leader</span>
   </div>
   <div class="hero-cue" aria-hidden="true">
@@ -367,14 +462,14 @@
 <!-- 2 · THESIS -->
 <section class="thesis" data-climate="bone" data-screen-label="thesis">
   <p class="thesis-line rv velvet-word misreg">songs held to tape until they keep their shape.</p>
-  <p class="thesis-sub rv">indie psychedelia out of arizona.</p>
+  <p class="thesis-sub rv">indie psychedelia out of phoenix, arizona.</p>
 </section>
 
 <!-- 3 · FORMING -->
 <section class="forming lit" id="forming" data-climate="teal" data-screen-label="forming">
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
   <div class="forming-art rv film" data-plx="16">
-    <img src="assets/photos/cover-bark.jpg" alt="unfocused texture — a record still forming">
+    <div class="unformed"><img src="assets/photos/vr-002-forming.jpg" alt="An unfinished record cover, still taking shape"></div>
     <div class="veil"></div>
     <span class="mono stamp" style="color:rgba(239,231,214,.6)">untitled · in the studio</span>
   </div>
@@ -389,6 +484,16 @@
       <span class="mono">·</span>
       <span class="mono">mmxxvi</span>
     </div>
+    <ol class="tracklist rv" aria-label="six tracks, not yet named">
+      <li><span class="tn mono">01</span><span class="smear"><span class="tw" style="--w:26%"></span><span class="tw" style="--w:14%"></span><span class="tw" style="--w:31%"></span></span></li>
+      <li><span class="tn mono">02</span><span class="smear"><span class="tw" style="--w:19%"></span><span class="tw" style="--w:38%"></span></span><span class="tt mono">frequency</span></li>
+      <li><span class="tn mono">03</span><span class="smear"><span class="tw" style="--w:12%"></span><span class="tw" style="--w:22%"></span><span class="tw" style="--w:16%"></span><span class="tw" style="--w:24%"></span></span></li>
+      <li><span class="tn mono">04</span><span class="smear"><span class="tw" style="--w:33%"></span><span class="tw" style="--w:17%"></span></span></li>
+      <li><span class="tn mono">05</span><span class="smear"><span class="tw" style="--w:15%"></span><span class="tw" style="--w:27%"></span><span class="tw" style="--w:13%"></span></span></li>
+      <li><span class="tn mono">06</span><span class="smear"><span class="tw" style="--w:21%"></span><span class="tw" style="--w:11%"></span><span class="tw" style="--w:29%"></span></span></li>
+    </ol>
+    <span class="mono rv tracknote">six of them. none of them named on tape yet.</span>
+    <a class="mono rv forming-link tunein" href="108.html"><span class="tune-static" aria-hidden="true"></span><span class="tune-t">tune in to 108.0</span><span class="tune-ar">&rarr;</span></a>
   </div>
 </section>
 
@@ -400,17 +505,17 @@
   </div>
   <div class="field-grid">
     <article class="fnote rv" data-plx="14">
-      <figure class="film"><img src="assets/photos/williams-drive.png" alt="sunset drive west of williams"><span class="rebate">vr–400 ▸ 07a</span></figure>
+      <figure class="film"><img src="assets/photos/williams-drive.png" alt="The warm mile of sky on a sunset drive west of Williams, Arizona, 7:38 pm"><span class="rebate">vr–400 ▸ 07a</span></figure>
       <p class="fnote-cap">west of williams. the warm part of the sky only lasts a mile. 7:38 pm.</p>
       <span class="mono">vr — 001</span>
     </article>
     <article class="fnote rv" data-plx="30">
-      <figure class="film"><img src="assets/photos/studio-desk.jpg" alt="studio desk, warm lamp"><span class="rebate">vr–400 ▸ 12a</span></figure>
+      <figure class="film"><img src="assets/photos/studio-desk.jpg" alt="A Kawai K3 synthesizer under a warm lamp on the studio desk at night"><span class="rebate">vr–400 ▸ 12a</span></figure>
       <p class="fnote-cap">lavender puts it into perspective.</p>
       <span class="mono">vr — 001</span>
     </article>
     <article class="fnote rv" data-plx="20">
-      <figure class="film"><img src="assets/photos/guitar-desk.png" alt="hands on an electric guitar at the desk, one lamp and a screen"><span class="rebate">vr–400 ▸ 31a</span></figure>
+      <figure class="film"><img src="assets/photos/guitar-desk.png" alt="Hands on an electric guitar at the recording desk, one lamp and one screen"><span class="rebate">vr–400 ▸ 31a</span></figure>
       <p class="fnote-cap">one lamp, one screen. 12:40 am. nothing named yet.</p>
       <span class="mono">vr — 001</span>
     </article>
@@ -432,20 +537,11 @@
   <hr class="ripple-rule" aria-hidden="true">
   <h2 class="letter-title rv misreg warp">the letter</h2>
   <p class="letter-copy rv">a note when there is something true to say. observations, not announcements.</p>
-  <form class="letter-form rv" id="letter-form" novalidate
-        method="post" target="eo-sink"
-        action="https://eomail5.com/form/a2d98e58-8abf-11f1-98b9-2bc8e1536409">
-    <input type="email" name="field_0" placeholder="your address" aria-label="email address" required>
-    <!-- EmailOctopus honeypot — bots fill it, people never see it -->
-    <input type="text" name="hpc4b27b6e-eb38-11e9-be00-06b4694bee2a"
-           tabindex="-1" autocomplete="off" aria-hidden="true"
-           style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+  <form class="letter-form rv" id="letter-form" novalidate>
+    <input type="email" placeholder="your address" aria-label="email address" required>
     <button type="submit">send</button>
   </form>
   <p class="letter-note" id="letter-note" aria-live="polite"></p>
-  <!-- the POST lands in here, so EmailOctopus never renders and the page never moves -->
-  <iframe name="eo-sink" title="signup" aria-hidden="true" tabindex="-1"
-          style="position:absolute;width:0;height:0;border:0;visibility:hidden"></iframe>
 </section>
 
 <footer data-climate="ink">
@@ -457,28 +553,35 @@
 
 <script src="liquid-scroll.js"></script>
 <script>
-/* the letter — system form states: error in claret, confirmation in moss, stated once.
-   a valid address is NOT preventDefault'd: the browser posts it to EmailOctopus
-   inside the hidden eo-sink iframe, so nothing of theirs ever renders and this
-   page never navigates. an invalid one never leaves the machine. */
+/* the room and the site share one origin, so the site can tell whether 108.0 has been found.
+   whoever solved the dial comes back to a tracklist with one row developed. nothing else changes. */
+(() => {
+  let solved = false;
+  try { solved = !!(JSON.parse(localStorage.getItem('vr.dial.v1')) || {}).claimed; } catch (e) {}
+  if (!solved) return;
+  const row = document.querySelector('.tracklist li:nth-child(2)');
+  if (row) row.classList.add('clear');
+  const note = document.querySelector('.tracknote');
+  if (note) note.textContent = 'six of them. one of them answers to a name now.';
+})();
+</script>
+<script>
+/* the letter — system form states: error in claret, confirmation in moss, stated once */
 (() => {
   const form = document.getElementById('letter-form');
-  const input = form.querySelector('input[type="email"]');
+  const input = form.querySelector('input');
   const note = document.getElementById('letter-note');
-  let sent = false;
   form.addEventListener('submit', (e) => {
+    e.preventDefault();
     const ok = input.value.trim() !== '' && input.checkValidity();
     input.setAttribute('aria-invalid', ok ? 'false' : 'true');
     form.classList.toggle('err', !ok);
     note.className = 'letter-note ' + (ok ? 'ok' : 'err');
     note.textContent = ok ? "you're on the list. quiet from here."
                           : "that address doesn't look right.";
-    if (!ok || sent) { e.preventDefault(); return; }
-    sent = true;                       // let it through — the post goes to eo-sink
-    setTimeout(() => form.reset(), 400);
+    if (ok) form.reset();
   });
   input.addEventListener('input', () => {
-    sent = false;
     form.classList.remove('err');
     if (note.classList.contains('err')) { note.className = 'letter-note'; note.textContent = ''; }
   });
