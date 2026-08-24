@@ -381,8 +381,12 @@
     try {
       const r = await api(mine ? '/rest/v1/rpc/comms_delete_own' : '/rest/v1/rpc/comms_delete_mod',
         mine ? { p_id: id, p_token: store.token } : { p_id: id, p_key: modKey });
-      if (!r.ok) throw new Error('http ' + r.status);
-      const ok = await r.json();
+      const raw = await r.text();
+      if (!r.ok) {
+        if (/not configured/i.test(raw)) throw new Error('no moderator key set on the server');
+        throw new Error('http ' + r.status);
+      }
+      const ok = JSON.parse(raw);
       if (!ok) {
         // the server refused: wrong moderator key, or the line is gone
         el.classList.remove('going');
@@ -414,8 +418,10 @@
   }
   function armMod() {
     const v = $('#cmodkey').value.trim();
-    if (!v || v === '••••••••') { modKey = ''; }
-    else { modKey = v; }
+    // re-arming while the mask is still showing must KEEP the key, not
+    // wipe it — clearing is what the empty field means.
+    if (v === '••••••••') return;
+    modKey = v;
     try { modKey ? sessionStorage.setItem('vr.mod', modKey) : sessionStorage.removeItem('vr.mod'); } catch (e) {}
     $('#cmodkey').value = modKey ? '••••••••' : '';
     cmod.dataset.on = modKey ? '1' : '';

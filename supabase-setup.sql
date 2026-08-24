@@ -121,7 +121,11 @@ declare
 begin
   select v into v_expect from public.comms_secret where k = 'mod';
   if v_expect is null then
-    return false;                       -- STEP 2 was never run
+    -- STEP 2 was never run. say so plainly rather than returning false:
+    -- an unset key and a wrong key are indistinguishable otherwise, and
+    -- that ambiguity is impossible to debug from the page. this leaks
+    -- nothing useful — it does not help anyone guess the passphrase.
+    raise exception 'moderator key not configured';
   end if;
   if encode(digest(p_key, 'sha256'), 'hex') is distinct from v_expect then
     perform pg_sleep(0.5);              -- blunt the guessing rate
