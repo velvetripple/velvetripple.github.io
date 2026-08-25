@@ -159,9 +159,6 @@
   store.mine = store.mine || [];      // ids of lines written from this browser
   store.local = store.local || [];    // the no-backend fallback logbook
 
-  let modKey = '';                    // moderator passphrase, this tab only
-  try { modKey = sessionStorage.getItem('vr.mod') || ''; } catch (e) {}
-
   function api(path, body) {
     return fetch(API + path, {
       method: body ? 'POST' : 'GET',
@@ -211,14 +208,18 @@
     return el;
   }
 
+  /* the × appears only on YOUR OWN lines. removing anyone else's is done
+     from the supabase dashboard, not from the page — there is deliberately
+     no moderator passphrase in the browser to be typed, autofilled,
+     shoulder-surfed or left armed in a stale tab. */
   function fitControls(el, rec) {
-    const want = isMine(rec.id) || !!modKey;
+    const want = isMine(rec.id);
     const has = el.querySelector('.del');
     if (want && !has) {
       const b = document.createElement('button');
       b.className = 'del';
       b.type = 'button';
-      b.title = isMine(rec.id) ? 'remove your transmission' : 'remove this transmission';
+      b.title = 'remove your transmission';
       b.setAttribute('aria-label', b.title);
       b.textContent = '×';
       b.addEventListener('click', () => removeComm(rec.id, el));
@@ -366,35 +367,27 @@
 
   // ---------- remove ---------------------------------------------------
   async function removeComm(id, el) {
-    if (busy) return;
-    const mine = isMine(id);
-    if (!mine && !modKey) return;
+    if (busy || !isMine(id)) return;
     busy = true;
     el.classList.add('going');
 
     if (!REMOTE) {
       store.local = store.local.filter((r) => r.id !== id);
-      if (mine) store.mine.splice(store.mine.indexOf(id), 1);
+      store.mine.splice(store.mine.indexOf(id), 1);
       save(); render(store.local); busy = false; return;
     }
 
     try {
-      const r = await api(mine ? '/rest/v1/rpc/comms_delete_own' : '/rest/v1/rpc/comms_delete_mod',
-        mine ? { p_id: id, p_token: store.token } : { p_id: id, p_key: modKey });
-      const raw = await r.text();
-      if (!r.ok) {
-        if (/not configured/i.test(raw)) throw new Error('no moderator key set on the server');
-        throw new Error('http ' + r.status);
-      }
-      const ok = JSON.parse(raw);
-      if (!ok) {
-        // the server refused: wrong moderator key, or the line is gone
+      const r = await api('/rest/v1/rpc/comms_delete_own', { p_id: id, p_token: store.token });
+      if (!r.ok) throw new Error('http ' + r.status);
+      if (!(await r.json())) {
+        // the line is already gone, or this browser lost its token
         el.classList.remove('going');
-        note(mine ? 'could not withdraw that line' : 'moderator key refused');
+        note('could not withdraw that line');
         busy = false;
         return;
       }
-      if (mine) store.mine.splice(store.mine.indexOf(id), 1);
+      store.mine.splice(store.mine.indexOf(id), 1);
       save();
       busy = false;
       await refresh();
@@ -404,34 +397,6 @@
       busy = false;
     }
   }
-
-  // ---------- moderator ------------------------------------------------
-  /* armed by loading the page with ?mod — that only reveals the field,
-     it grants nothing. the passphrase is checked inside postgres, and it
-     is never written to disk here: sessionStorage dies with the tab. */
-  const cmod = $('#cmod');
-  if (cmod && (/[?&]mod\b/.test(location.search) || modKey)) {
-    cmod.hidden = false;
-    if (modKey) $('#cmodkey').value = '••••••••';
-    $('#cmodgo').addEventListener('click', armMod);
-    $('#cmodkey').addEventListener('keydown', (e) => { if (e.key === 'Enter') armMod(); });
-  }
-  function armMod() {
-    const v = $('#cmodkey').value.trim();
-    // re-arming while the mask is still showing must KEEP the key, not
-    // wipe it — clearing is what the empty field means.
-    if (v === '••••••••') return;
-    modKey = v;
-    try { modKey ? sessionStorage.setItem('vr.mod', modKey) : sessionStorage.removeItem('vr.mod'); } catch (e) {}
-    $('#cmodkey').value = modKey ? '••••••••' : '';
-    cmod.dataset.on = modKey ? '1' : '';
-    // the key is not verified until a delete is actually attempted —
-    // there is deliberately no "check my password" endpoint to hammer.
-    Array.prototype.forEach.call(clog.querySelectorAll('[data-comm-id]'), (el) => {
-      fitControls(el, { id: el.dataset.commId });
-    });
-  }
-  if (modKey && cmod) cmod.dataset.on = '1';
 
   // ---------- wiring ---------------------------------------------------
   csend.addEventListener('click', transmit);

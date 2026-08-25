@@ -151,9 +151,8 @@ input:focus{border-bottom-color:var(--honey)}
 .send:hover{color:var(--bone)}
 .spent{color:rgba(239,231,214,.28);font-size:9.5px;letter-spacing:.12em}
 .spent.warn{color:rgba(224,85,72,.9)}
-/* withdraw — only rendered on lines you may actually remove: your own,
-   or any line once the moderator key is armed. it is a request, not a
-   permission: postgres checks the secret and decides. */
+/* withdraw — rendered only on your own lines. it is a request, not a
+   permission: postgres checks the browser's token and decides. */
 .del{grid-column:3;align-self:start;background:none;border:none;cursor:pointer;
   color:rgba(239,231,214,.22);font-family:inherit;font-size:12px;line-height:1.35;
   padding:0 1px;opacity:0;transition:opacity .25s ease,color .25s ease}
@@ -162,12 +161,8 @@ input:focus{border-bottom-color:var(--honey)}
 .del:focus-visible{outline:1px solid var(--honey);outline-offset:2px}
 @media (hover:none){.del{opacity:.5}}
 .line.going{opacity:.28;transition:opacity .3s ease}
-/* moderator — the field is revealed by ?mod, which grants nothing on
-   its own. hidden entirely for everyone else. */
-.cmod{display:flex;gap:8px;align-items:center;margin-top:2px}
-.cmod[hidden]{display:none}
-.cmod input{font-size:10px}
-.cmod[data-on="1"] input{border-bottom-color:rgba(224,85,72,.7)}
+/* removing anyone else's line is done from the supabase dashboard.
+   there is no moderator field in the page by design. */
 
 /* ---------- claim ---------- */
 .claim{position:fixed;inset:0;z-index:7;display:grid;place-items:center;align-content:center;overflow-y:auto;background:radial-gradient(58% 56% at 50% 50%,rgba(8,7,6,.88),rgba(8,7,6,.5) 66%,rgba(8,7,6,.12));opacity:0;pointer-events:none;transition:opacity 2.2s ease;padding:24px}
@@ -277,10 +272,6 @@ input:focus{border-bottom-color:var(--honey)}
         <button class="send" id="csend">transmit</button>
       </div>
       <span class="spent" id="cspent"></span>
-      <div class="cmod" id="cmod" hidden>
-        <input id="cmodkey" type="password" placeholder="moderator key" autocomplete="off" spellcheck="false">
-        <button class="send" id="cmodgo">arm</button>
-      </div>
     </div>
   </div>
 </div>

@@ -9,11 +9,14 @@
 --     no delete. row-level security is on with zero policies, which
 --     denies everything.
 --   · every write goes through a security-definer function that checks
---     a secret first. so "delete your own" and "the owner deletes any"
---     are enforced by postgres, not by hiding buttons in javascript.
+--     the writer's browser token first, so "delete your own" is enforced
+--     by postgres rather than by hiding a button in javascript.
+--   · removing SOMEONE ELSE's line is yours alone and happens here, in
+--     the dashboard — see MODERATION at the bottom. the site has no
+--     moderator field, so there is no passphrase in a browser to be
+--     typed, autofilled or left armed in a stale tab.
 --
--- after running this, scroll to STEP 2 at the bottom and set your
--- moderator passphrase. nothing works for you as moderator until you do.
+-- run this whole file once. that is the entire setup.
 -- ===================================================================
 
 create extension if not exists pgcrypto with schema extensions;
@@ -187,7 +190,13 @@ revoke all on function public.comms_check_mod_key(text)      from public;
 
 grant execute on function public.comms_post(text, text, text) to anon, authenticated;
 grant execute on function public.comms_delete_own(uuid, text)  to anon, authenticated;
-grant execute on function public.comms_delete_mod(uuid, text)  to anon, authenticated;
+
+-- comms_delete_mod is NOT granted to anon. the site has no moderator
+-- field any more — you remove other people's lines from the dashboard
+-- (see housekeeping below). leaving a passphrase-checking function
+-- reachable from the internet with no legitimate caller would just be a
+-- free oracle to guess against, so it stays shut.
+revoke all on function public.comms_delete_mod(uuid, text) from anon, authenticated;
 
 -- the key-setter and the key-checker stay out of the website's reach
 revoke all on function public.comms_set_mod_key(text)   from anon, authenticated;
@@ -195,7 +204,12 @@ revoke all on function public.comms_check_mod_key(text) from anon, authenticated
 
 
 -- ===================================================================
--- STEP 2 — set your moderator passphrase
+-- STEP 2 — set a moderator passphrase   (OPTIONAL — probably skip it)
+-- ===================================================================
+-- the site no longer has a moderator field, so nothing calls this and
+-- the passphrase buys you nothing. moderation is the housekeeping
+-- section at the bottom of this file. kept only in case a moderator
+-- ui is ever wanted again.
 -- ===================================================================
 -- run this one line with your own passphrase. only the sha256 is
 -- stored, so the passphrase itself never lands in the database and
@@ -212,14 +226,28 @@ revoke all on function public.comms_check_mod_key(text) from anon, authenticated
 
 
 -- ===================================================================
--- housekeeping you may want later
+-- MODERATION — how you remove someone else's transmission
 -- ===================================================================
--- see everything, including what you have hidden:
---   select id, created_at, callsign, body, hidden from public.comms
---    order by created_at desc;
+-- supabase dashboard -> SQL Editor -> New query. these run as the
+-- owner, so RLS does not apply to them.
 --
--- hide a line instead of destroying it (keeps the evidence):
---   update public.comms set hidden = true where id = '...';
+-- read the logbook, newest first:
+--   select id, created_at, callsign, body, hidden
+--     from public.comms order by created_at desc;
 --
--- wipe the logbook:
+-- hide one line — it vanishes from the site but stays on the table,
+-- which is what you want if you may need the evidence later:
+--   update public.comms set hidden = true
+--    where body ilike '%the offending words%';
+--
+-- destroy one line outright:
+--   delete from public.comms where id = 'paste-the-id-here';
+--
+-- put a hidden line back:
+--   update public.comms set hidden = false where id = '...';
+--
+-- wipe the whole logbook:
 --   truncate public.comms;
+--
+-- there is also a Table Editor in the sidebar if you would rather click
+-- than type: pick the `comms` table, tick a row, delete.
