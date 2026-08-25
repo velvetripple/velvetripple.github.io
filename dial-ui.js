@@ -51,6 +51,7 @@
   const glass = $('#glass'), needle = $('#needle'), read = $('#read'), holdBar = $('#hold');
   const scale = $('#scale'), masts = $('#masts'), vu = $('#vufill'), hail = $('#hail'), ghost = $('#ghost');
   const clog = $('#clog'), cinput = $('#cinput'), csend = $('#csend'), cspent = $('#cspent'), you = $('#you');
+  const bandLabel = document.querySelector('.band-l');
   const claim = $('#claim'), cv = $('#bands'), cx2 = cv.getContext('2d');
 
   let needleF = 92.4, held = 0, dragging = false, lastX = 0, powered = false, tone = .5, vol = .72;
@@ -82,8 +83,12 @@
     for (let f = FMIN; f <= END + .001; f += 0.1) {
       const maj = Math.abs(f % 2) < .01 || Math.abs(f % 2 - 2) < .01;
       const mid = Math.abs(f % 1) < .01;
-      html += `<span class="tick ${maj ? 'maj' : mid ? '' : 'min'}" style="left:${pct(f)}%"></span>`;
-      if (maj) html += `<span class="numl" style="left:${pct(f)}%">${f.toFixed(0)}</span>`;
+      // `half` and `q4` carry no weight on desktop — they exist so the
+      // narrow-screen css can thin the scale out without rebuilding it.
+      const half = Math.abs(f % 0.5) < .01 || Math.abs(f % 0.5 - 0.5) < .01;
+      const q4 = Math.abs(f % 4) < .01 || Math.abs(f % 4 - 4) < .01;
+      html += `<span class="tick ${maj ? 'maj' : mid ? '' : 'min'}${half ? ' half' : ''}" style="left:${pct(f)}%"></span>`;
+      if (maj) html += `<span class="numl${q4 ? ' q4' : ''}" style="left:${pct(f)}%">${f.toFixed(0)}</span>`;
     }
     html += `<span class="endmark" style="left:${pct(END)}%"></span>`;
     html += `<span class="past" id="past" style="left:${pct(TOP)}%">108.0</span>`;
@@ -489,7 +494,7 @@
     if (i < 0) return;
     presets[i] = f;
     preBtns[i].textContent = f.toFixed(1);
-    preBtns[i].classList.add('set');
+    preBtns[i].classList.add('saved');   // NOT 'set' — that is the cabinet's class
   }
 
   // station stamps are packed the same way the etched lines are — nowrap copy at 96.1 and 99.3
@@ -855,6 +860,9 @@
     // paint the set
     needle.style.left = pct(needleF) + '%';
     if (!finished) read.style.left = clamp(pct(needleF), 10, 90) + '%';
+    /* the readout would otherwise sit straight on top of "fm · mhz" at
+       the bottom of the band. fade the label as the needle arrives. */
+    if (bandLabel) bandLabel.style.opacity = pct(needleF) < 20 ? '0' : '1';
     if (finished) read.textContent = 'velvet ripple — frequency';
     else {
       const flick = prox > .55 && Math.random() < .12 ? near.f : needleF;

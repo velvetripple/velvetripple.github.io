@@ -109,7 +109,11 @@ body[data-after="on"] .comms{opacity:1}
 .endmark{position:absolute;bottom:26px;width:1px;height:20px;background:rgba(224,85,72,.5)}
 .past{position:absolute;bottom:6px;translate:-50% 0;font-size:11px;color:var(--honey);opacity:0;transition:opacity 1.4s ease;font-variant-numeric:tabular-nums}
 .past.on{opacity:1}
-.band-l{position:absolute;left:10px;top:9px;font-size:9px;letter-spacing:.24em;color:rgba(239,231,214,.34)}
+/* the readout rides the needle across the top of the glass and runs
+   straight through this label at the bottom of the band. js fades it out
+   as the needle closes in. */
+.band-l{position:absolute;left:10px;top:9px;font-size:9px;letter-spacing:.24em;color:rgba(239,231,214,.34);
+  transition:opacity .35s ease;pointer-events:none}
 .needle{position:absolute;top:4px;bottom:20px;width:2px;translate:-1px 0;background:linear-gradient(rgba(224,85,72,.4),var(--sig) 22%,var(--sig-d));box-shadow:0 0 12px 2px rgba(224,85,72,.45)}
 .needle::after{content:"";position:absolute;left:-5px;bottom:-7px;width:12px;height:8px;background:linear-gradient(#4A413B,#221D19);border-radius:2px;box-shadow:inset 0 1px 0 rgba(239,231,214,.2)}
 .read{position:absolute;top:8px;translate:-50% 0;font-size:12.5px;letter-spacing:.08em;color:var(--honey);font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:0 0 10px rgba(217,162,75,.45)}
@@ -121,8 +125,12 @@ body[data-after="on"] .comms{opacity:1}
 .pre{flex:none;width:58px;height:26px;border-radius:3px;border:1px solid rgba(239,231,214,.16);background:linear-gradient(#4E1715,#2C0E0C);
   color:rgba(239,231,214,.3);font-family:inherit;font-size:9.5px;letter-spacing:.1em;cursor:default;
   box-shadow:inset 0 1px 0 rgba(239,231,214,.16),0 2px 4px rgba(0,0,0,.5);font-variant-numeric:tabular-nums}
-.pre.set{color:var(--honey);cursor:pointer;border-color:rgba(217,162,75,.34)}
-.pre.set:hover{color:var(--bone)}
+/* NB: this state class must never be called `set` — `.set` is the radio
+   cabinet, and a preset button carrying it inherits the cabinet's margin
+   and padding (which .pre never overrides), blowing the strip onto two
+   rows and shoving the whole radio up the screen. */
+.pre.saved{color:var(--honey);cursor:pointer;border-color:rgba(217,162,75,.34)}
+.pre.saved:hover{color:var(--bone)}
 .pre:active{translate:0 1px}
 .corner{display:flex;gap:16px;align-items:center;margin-left:auto;color:rgba(239,231,214,.34)}
 
@@ -204,6 +212,14 @@ input:focus{border-bottom-color:var(--honey)}
   .set{margin:0 12px 30px;padding:14px}
   .setrow{gap:12px}.knob{width:50px;height:50px}
   .glass{height:120px}
+  /* the band is ~212px wide here. at 0.1 mhz per tick that is a tick
+     every 0.98px — a solid smear rather than a slide rule. drop to 0.5
+     mhz, and label every 4 mhz instead of every 2 (88/90/…/106 overlap
+     by 2px at this width once the numbers reach three digits). */
+  .tick.min:not(.half){display:none}
+  .numl:not(.q4){display:none}
+  .numl{font-size:10px}
+  .band-l{letter-spacing:.16em}
   .recall{font-size:8.5px;letter-spacing:.12em}
   .cmark{left:14px}
   .home{left:14px;top:14px;font-size:9px}
