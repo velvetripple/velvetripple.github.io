@@ -413,9 +413,18 @@
        font-family:var(--font-mono); font-size:10px; letter-spacing:.2em;
        text-transform:uppercase; padding:0 4px; transition:color var(--dur-hover,400ms) ease; }
   .letter-form button:hover{ color:#D9A24B; } /* honey as text — legal here: ink climate only */
+  /* back from eomail5 there is nothing left to ask for, so the field and the send give up their
+     slot and the answer takes it — same rule, same height, nothing on the page moves. it is set
+     in the mono face and left-aligned on the rule so it reads as a line of plain text rather
+     than as a message about a form. */
+  .letter-said{ display:none; flex:1; font-family:var(--font-mono);
+       font-size:.8rem; letter-spacing:.16em; line-height:1.6; text-align:left;
+       padding:12px 2px; color:var(--ok-on-deep,#A9BD97); }
+  .letter-form.sent{ border-bottom-color:var(--ok-on-deep,#A9BD97); }
+  .letter-form.sent input, .letter-form.sent button{ display:none; }
+  .letter-form.sent .letter-said{ display:block; }
   .letter-note{ font-family:var(--font-body); font-size:.88rem; line-height:1.6; min-height:1.6em; }
-  .letter-note.err{ color:var(--error-on-deep,#D99A93); }
-  .letter-note.ok{ color:var(--ok-on-deep,#A9BD97); }
+  .letter-note.err{ color:var(--error-on-deep,#D99A93); } /* the note only ever carries the error now */
 
   footer{ display:flex; align-items:baseline; gap:24px; row-gap:14px; flex-wrap:wrap; padding:40px; position:relative; }
   footer .mono{ white-space:nowrap; }
@@ -570,6 +579,7 @@
     <input type="email" name="field_0" id="field_0" placeholder="your address" aria-label="email address" autocomplete="email" required>
     <input type="text" name="hpa2d98e58-8abf-11f1-98b9-2bc8e1536409" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <input type="hidden" name="successRedirectUrl" value="https://velvetripple.art/?letter=sent#letter">
+    <span class="letter-said" id="letter-said" role="status">you&rsquo;re on the list. quiet from here.</span>
     <button type="submit">send</button>
   </form>
   <p class="letter-note" id="letter-note" aria-live="polite"></p>
@@ -605,17 +615,17 @@
 <script>
 /* the letter — a plain POST to emailoctopus; none of their script on the page, so the form keeps
    the site's face. a bad address is caught here; a good one leaves for eomail5 and comes back to
-   ?letter=sent, where the confirmation is stated once. */
+   ?letter=sent, where the form gives its slot over to the confirmation. */
 (() => {
   const form = document.getElementById('letter-form');
   const input = form.querySelector('input[type=email]');
   const note = document.getElementById('letter-note');
-  const say = (ok, msg) => { note.className = 'letter-note ' + (ok ? 'ok' : 'err'); note.textContent = msg; };
+  const fail = (msg) => { note.className = 'letter-note err'; note.textContent = msg; };
   form.addEventListener('submit', (e) => {
     const ok = input.value.trim() !== '' && input.checkValidity();
     input.setAttribute('aria-invalid', ok ? 'false' : 'true');
     form.classList.toggle('err', !ok);
-    if (!ok) { e.preventDefault(); say(false, "that address doesn't look right."); return; }
+    if (!ok) { e.preventDefault(); fail("that address doesn't look right."); return; }
     form.querySelector('button').disabled = true;
   });
   input.addEventListener('input', () => {
@@ -623,7 +633,7 @@
     if (note.classList.contains('err')) { note.className = 'letter-note'; note.textContent = ''; }
   });
   if (new URLSearchParams(location.search).get('letter') === 'sent') {
-    say(true, "you're on the list. quiet from here.");
+    form.classList.add('sent');
     history.replaceState(null, '', location.pathname + '#letter');
   }
 })();
