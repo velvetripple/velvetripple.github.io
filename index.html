@@ -614,11 +614,13 @@
 </script>
 <script>
 /* the letter — a plain POST to emailoctopus; none of their script on the page, so the form keeps
-   the site's face. a bad address is caught here; a good one leaves for eomail5 and comes back to
-   ?letter=sent, where the form gives its slot over to the confirmation. */
+   the site's face. a bad address is caught here; a good one is posted in the background and the
+   form gives its slot over to the confirmation without the page ever leaving.
+   the action/method stay on the <form> as the no-js fallback. */
 (() => {
   const form = document.getElementById('letter-form');
   const input = form.querySelector('input[type=email]');
+  const button = form.querySelector('button');
   const note = document.getElementById('letter-note');
   const fail = (msg) => { note.className = 'letter-note err'; note.textContent = msg; };
   form.addEventListener('submit', (e) => {
@@ -626,7 +628,22 @@
     input.setAttribute('aria-invalid', ok ? 'false' : 'true');
     form.classList.toggle('err', !ok);
     if (!ok) { e.preventDefault(); fail("that address doesn't look right."); return; }
-    form.querySelector('button').disabled = true;
+    /* keep the page. eomail5 answers this endpoint with json, so a native post would
+       dump that json over the site; post it ourselves instead and stay put. */
+    e.preventDefault();
+    button.disabled = true;
+    const body = new FormData(form);
+    body.delete('successRedirectUrl');
+    fetch(form.action, { method: 'POST', mode: 'no-cors', body })
+      .then(() => {
+        note.className = 'letter-note';
+        note.textContent = '';
+        form.classList.add('sent');
+      })
+      .catch(() => {
+        button.disabled = false;
+        fail("that didn't send. try again in a moment.");
+      });
   });
   input.addEventListener('input', () => {
     form.classList.remove('err');
