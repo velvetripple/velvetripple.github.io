@@ -36,8 +36,9 @@
 </script>
 <style>
   /* ============================================================
-     VELVET RIPPLE — Liquid Velvet site · v4
+     VELVET RIPPLE — Liquid Velvet site · v5 (release)
      calm at rest · liquefies on scroll · bone sinks to inkwell
+     sept 4 2026: the single is named, the cover is sharp, the site can be listened to
      indie psychedelia: a liquid light show under every scene,
      climate-graded photos, ripple rings, warped display type
      analog: paper fiber · velvet nap · dust · vignette ·
@@ -70,22 +71,13 @@
         --mis-a:rgba(107,30,26,.55); --mis-b:rgba(217,162,75,.16); --halo:rgba(217,162,75,.15); }
 
   /* ---- the ground ---------------------------------------------
-     the page colour used to be `transition:background-color` on <body>,
-     which repaints the whole viewport on every frame of the fade — and
-     the three fixed plates above it (.vig, .stock soft-light, .grain
-     multiply) all have to re-blend against each of those repaints.
-
-     instead: one solid pane per climate, stacked, crossfaded by OPACITY
-     alone. opacity on a solid fixed layer is a compositor property, so
-     the recolour costs no paint at all. the scroll engine drives the
-     opacities straight from scrollY, so the colour tracks the scroll
-     instead of easing in 1.4s behind it. panes are built by JS from the
-     [data-climate] sections, in document order. */
+     one solid pane per climate, stacked, crossfaded by OPACITY alone —
+     a compositor property, so the recolour costs no paint. liquid-scroll.js
+     builds the panes from the [data-climate] sections and drives their
+     opacities straight from scrollY. */
   .ground{ position:fixed; inset:0; z-index:-1; pointer-events:none;
     contain:layout paint style; }
   .ground i{ position:absolute; inset:0; opacity:0; }
-  /* the first pane is the base and never animates — only the ones that
-     wipe in over it need a compositor layer */
   .ground i + i{ will-change:opacity; }
   .ground .g-bone{ background:#EFE7D6; }
   .ground .g-teal{ background:#2B4549; }
@@ -295,13 +287,12 @@
   .forming{ min-height:100vh; display:grid; grid-template-columns:1fr 1fr;
        align-items:center; gap:60px; padding:120px 64px; max-width:1280px; margin:0 auto; }
   .forming-art{ position:relative; aspect-ratio:1/1; overflow:hidden; background:#1E1A17; }
-  /* the cover is in the room but hasn't taken shape — the melt is baked into the file,
-     not applied here, so devtools can't undo it and read the art early. the softening lives
-     on a wrapper so it COMPOSES with the .film climate grade instead of losing to it. */
-  .forming-art .unformed{ position:absolute; inset:0; filter:blur(9px) url(#vr-melt); }
-  .forming-art img{ position:absolute; inset:-8%; width:116%; height:116%; object-fit:cover;
-       transform:scale(1.06); }
-  .forming-art .veil{ position:absolute; inset:0; background:rgba(22,19,17,.22); }
+  /* the cover has been public since the announce — it sits sharp, and it is exempt from the
+     climate grade: artwork has to match what people find on the shelf */
+  .forming-art img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; display:block; }
+  body[data-climate] .forming-art img{ filter:none; }
+  /* the cover prints its own title bottom-left, so the rebate moves to the top edge */
+  .forming-art .rebate{ top:6px; bottom:auto; }
 
   /* tracklist — present, six rows, none of it legible yet. the rows carry word LENGTHS
      only: no titles exist in the markup, so there is nothing to read in the source either. */
@@ -319,12 +310,12 @@
   .tracklist li:nth-child(5) .smear{ translate:-1px 1px; opacity:.7; }
   .tracklist li:nth-child(6) .smear{ translate:3px 0; opacity:.62; }
   .tracklist .smear{ display:flex; align-items:baseline; gap:7px; flex:1; filter:url(#vr-melt) blur(2.9px); }
-  /* one track develops once the room has been solved — the rest stay on the shelf */
+  /* the second track has a name now — it develops as the list comes into view; the rest stay on the shelf */
   .tracklist .tt{ display:none; }
   .tracklist li.clear .smear{ display:none; }
   .tracklist li.clear .tt{ display:inline; color:var(--vr-honey); opacity:1;
-       text-transform:none; font-size:.8rem; letter-spacing:.16em;
-       animation:trackDevelop 2.6s ease both .5s; }
+       text-transform:none; font-size:.8rem; letter-spacing:.16em; }
+  .tracklist.in li.clear .tt{ animation:trackDevelop 2.6s ease both .5s; }
   .tracklist li.clear .tn{ opacity:.85; }
   @keyframes trackDevelop{ from{ filter:blur(7px); opacity:0; }
        60%{ filter:blur(1.2px); opacity:.7; } to{ filter:blur(0); opacity:1; } }
@@ -365,6 +356,16 @@
   .forming-it{ font-family:var(--font-display); font-style:italic;
        font-size:1.1rem; line-height:1.6; color:var(--pfg2); max-width:34ch;
        transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
+  .forming-body{ font-family:var(--font-body); font-size:.98rem; line-height:1.7;
+       color:var(--pfg2); max-width:40ch; transition:color var(--clim-dur,.45s) cubic-bezier(.33,0,.2,1); }
+  /* the one loud thing on the page — honey plate, ink type. the song is allowed to be loud. */
+  .listen{ align-self:flex-start; display:inline-flex; align-items:center; gap:14px;
+       padding:14px 22px; margin-top:6px; font-family:var(--font-mono); font-size:11px;
+       letter-spacing:.26em; text-transform:uppercase; color:#161311; background:var(--vr-honey);
+       border:1px solid var(--vr-honey);
+       transition:background var(--dur-hover,.5s) ease, border-color var(--dur-hover,.5s) ease, gap var(--dur-hover,.5s) ease; }
+  .listen:hover{ background:#E4B15F; border-color:#E4B15F; gap:20px; }
+  .listen .ar{ opacity:.7; }
   .forming-meta{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
   /* the one door to the frequency room — never explained */
   .forming-link{ align-self:flex-start; margin-top:16px; letter-spacing:.24em;
@@ -407,6 +408,7 @@
   .letter-form input{ flex:1; background:none; border:none; outline:none; color:var(--pfg);
        font-family:var(--font-body); font-size:1.02rem; padding:12px 2px; }
   .letter-form input::placeholder{ color:var(--pfg3); }
+  .letter-form .hp{ position:absolute; left:-5000px; width:1px; height:1px; opacity:0; } /* honeypot — people never see it, bots fill it */
   .letter-form button{ background:none; border:none; cursor:pointer; color:var(--pfg2);
        font-family:var(--font-mono); font-size:10px; letter-spacing:.2em;
        text-transform:uppercase; padding:0 4px; transition:color var(--dur-hover,400ms) ease; }
@@ -415,7 +417,8 @@
   .letter-note.err{ color:var(--error-on-deep,#D99A93); }
   .letter-note.ok{ color:var(--ok-on-deep,#A9BD97); }
 
-  footer{ display:flex; align-items:baseline; gap:24px; padding:40px; position:relative; }
+  footer{ display:flex; align-items:baseline; gap:24px; row-gap:14px; flex-wrap:wrap; padding:40px; position:relative; }
+  footer .mono{ white-space:nowrap; }
   footer::before{ content:""; position:absolute; top:0; left:40px; right:40px; height:6px;
        background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='6'%3E%3Cpath d='M0 3 Q 6.5 0 13 3 T 26 3' fill='none' stroke='%23EFE7D6' stroke-opacity='.28'/%3E%3C/svg%3E") repeat-x; }
   footer .nav-mark{ font-size:15px; }
@@ -459,7 +462,7 @@
 
 <nav>
   <a class="nav-mark" href="#top">velvet ripple</a>
-  <a class="lnk" href="#forming">forming</a>
+  <a class="lnk" href="#forming">listen</a>
   <a class="lnk" href="#field">field</a>
   <a class="lnk" href="#word">word</a>
   <a class="lnk" href="#letter">letter</a>
@@ -471,15 +474,15 @@
 <section class="hero lit" id="top" data-climate="bone" data-screen-label="hero">
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
   <div class="rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <span class="mono">vr — 001 · indie psychedelia · arizona</span>
+  <span class="mono">vr — 002 · indie psychedelia · arizona</span>
   <h1 class="hero-word velvet-word misreg">velvet<br>ripple</h1>
   <p class="hero-sub">the in-between hour, recorded.</p>
   <div class="hero-strip film" data-plx="22">
-    <img src="assets/photos/williams-drive.png" alt="Dusk on the highway west of Williams, Arizona — a Velvet Ripple field photograph">
+    <img src="assets/photos/towers-strip.jpg" alt="Red tower lights on a ridge at night, seen from the highway — the Frequency field photograph">
     <span class="rebate">vr–400 ▸ leader</span>
   </div>
   <div class="hero-cue" aria-hidden="true">
-    <svg class="cue-ring" viewBox="0 0 100 100"><defs><path id="cue-o" d="M50,50 m-39,0 a39,39 0 1,1 78,0 a39,39 0 1,1 -78,0"></path></defs><text><textPath href="#cue-o">slow · velvet ripple · vr — 001 ·&#160;</textPath></text></svg>
+    <svg class="cue-ring" viewBox="0 0 100 100"><defs><path id="cue-o" d="M50,50 m-39,0 a39,39 0 1,1 78,0 a39,39 0 1,1 -78,0"></path></defs><text><textPath href="#cue-o">slow · velvet ripple · vr — 002 ·&#160;</textPath></text></svg>
     <span class="cue-arrow">↓</span>
   </div>
 </section>
@@ -490,34 +493,35 @@
   <p class="thesis-sub rv">indie psychedelia out of phoenix, arizona.</p>
 </section>
 
-<!-- 3 · FORMING -->
-<section class="forming lit" id="forming" data-climate="teal" data-screen-label="forming">
+<!-- 3 · THE SINGLE · the record, still forming behind it -->
+<section class="forming lit" id="forming" data-climate="teal" data-screen-label="the single">
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
   <div class="forming-art rv film" data-plx="16">
-    <div class="unformed"><img src="assets/photos/vr-002-forming.jpg" alt="An unfinished record cover, still taking shape"></div>
-    <div class="veil"></div>
-    <span class="mono stamp" style="color:rgba(239,231,214,.6)">untitled · in the studio</span>
+    <img src="assets/photos/frequency-cover-1200.jpg" alt="Frequency — single cover art: a crowd dissolved into pink, blue and orange light">
+    <span class="rebate">vr–400 ▸ 02</span>
   </div>
   <div class="forming-copy">
-    <span class="mono rv">001 — forming</span>
-    <h2 class="forming-title rv misreg warp">something is taking shape.</h2>
-    <p class="forming-it rv">it isn&rsquo;t named here yet. tape first; titles later. when it can hold its own weight, you&rsquo;ll hear it.</p>
+    <span class="mono rv">vr — 002 · the single</span>
+    <h2 class="forming-title rv misreg warp">frequency.</h2>
+    <p class="forming-it rv">the second of six. september 4, 2026.</p>
+    <p class="forming-body rv">you can&rsquo;t see the towers from the highway. only the lights &mdash; each on its own timing, never together. that&rsquo;s the song.</p>
+    <a class="listen rv" id="listen" href="https://ditto.fm/frequency-velvet-ripple" target="_blank" rel="noopener" data-live="2026-09-04T17:00:00Z"><span class="listen-t">pre-save</span><span class="ar">&rarr;</span></a>
     <div class="forming-meta rv">
-      <span class="mono">SIX-TRACK</span>
+      <span class="mono">3:36</span>
+      <span class="mono">·</span>
+      <span class="mono">108 bpm</span>
       <span class="mono">·</span>
       <span class="mono">tape</span>
-      <span class="mono">·</span>
-      <span class="mono">mmxxvi</span>
     </div>
-    <ol class="tracklist rv" aria-label="six tracks, not yet named">
+    <ol class="tracklist rv" aria-label="six tracks, one of them named">
       <li><span class="tn mono">01</span><span class="smear"><span class="tw" style="--w:26%"></span><span class="tw" style="--w:14%"></span><span class="tw" style="--w:31%"></span></span></li>
-      <li><span class="tn mono">02</span><span class="smear"><span class="tw" style="--w:19%"></span><span class="tw" style="--w:38%"></span></span><span class="tt mono">frequency</span></li>
+      <li class="clear"><span class="tn mono">02</span><span class="smear"><span class="tw" style="--w:19%"></span><span class="tw" style="--w:38%"></span></span><span class="tt mono">frequency</span></li>
       <li><span class="tn mono">03</span><span class="smear"><span class="tw" style="--w:12%"></span><span class="tw" style="--w:22%"></span><span class="tw" style="--w:16%"></span><span class="tw" style="--w:24%"></span></span></li>
       <li><span class="tn mono">04</span><span class="smear"><span class="tw" style="--w:33%"></span><span class="tw" style="--w:17%"></span></span></li>
       <li><span class="tn mono">05</span><span class="smear"><span class="tw" style="--w:15%"></span><span class="tw" style="--w:27%"></span><span class="tw" style="--w:13%"></span></span></li>
       <li><span class="tn mono">06</span><span class="smear"><span class="tw" style="--w:21%"></span><span class="tw" style="--w:11%"></span><span class="tw" style="--w:29%"></span></span></li>
     </ol>
-    <span class="mono rv tracknote">six of them. none of them named on tape yet.</span>
+    <span class="mono rv tracknote">six of them. the second one has a name.</span>
     <a class="mono rv forming-link tunein" href="108.html"><span class="tune-static" aria-hidden="true"></span><span class="tune-t">tune in to 108.0</span><span class="tune-ar">&rarr;</span></a>
   </div>
 </section>
@@ -552,8 +556,8 @@
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
   <div class="rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <span class="mono rv">the word</span>
-  <p class="word-lyric rv velvet-word misreg">the river keeps the bend<br>even after we leave.</p>
-  <span class="mono rv">vr — 001</span>
+  <p class="word-lyric rv velvet-word misreg">almost is where<br>i&rsquo;ve always been.</p>
+  <span class="mono rv">vr — 002</span>
 </section>
 
 <!-- 6 · THE LETTER -->
@@ -562,8 +566,10 @@
   <hr class="ripple-rule" aria-hidden="true">
   <h2 class="letter-title rv misreg warp">the letter</h2>
   <p class="letter-copy rv">a note when there is something true to say. observations, not announcements.</p>
-  <form class="letter-form rv" id="letter-form" novalidate>
-    <input type="email" placeholder="your address" aria-label="email address" required>
+  <form class="letter-form rv" id="letter-form" method="post" action="https://eomail5.com/form/a2d98e58-8abf-11f1-98b9-2bc8e1536409" novalidate>
+    <input type="email" name="field_0" id="field_0" placeholder="your address" aria-label="email address" autocomplete="email" required>
+    <input type="text" name="hpa2d98e58-8abf-11f1-98b9-2bc8e1536409" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <input type="hidden" name="successRedirectUrl" value="https://velvetripple.art/?letter=sent#letter">
     <button type="submit">send</button>
   </form>
   <p class="letter-note" id="letter-note" aria-live="polite"></p>
@@ -571,45 +577,55 @@
 
 <footer data-climate="ink">
   <span class="nav-mark">velvet ripple</span>
+  <span class="mono"><a href="https://ditto.fm/frequency-velvet-ripple" target="_blank" rel="noopener">listen — frequency</a></span>
   <span class="mono"><a href="https://instagram.com/velvet.ripple" target="_blank" rel="noopener">instagram — @velvet.ripple</a></span>
-  <span class="mono right">vr — 001 · mmxxvi</span>
+  <span class="mono"><a href="https://www.threads.com/@velvet.ripple" target="_blank" rel="noopener">threads — @velvet.ripple</a></span>
+  <span class="mono right">vr — 002 · mmxxvi</span>
 </footer>
 
 
 <script src="liquid-scroll.js"></script>
 <script>
+/* the button tells the truth about the date — pre-save until 10:00 phoenix on sept 4, listen after.
+   the smartlink itself flips on its own; this just keeps the label honest without a redeploy. */
+(() => {
+  const a = document.getElementById('listen');
+  if (a && Date.now() >= Date.parse(a.dataset.live)) a.querySelector('.listen-t').textContent = 'listen';
+})();
 /* the room and the site share one origin, so the site can tell whether 108.0 has been found.
-   whoever solved the dial comes back to a tracklist with one row developed. nothing else changes. */
+   the track is public now, so the row is legible for everyone — solvers get one quieter line. */
 (() => {
   let solved = false;
   try { solved = !!(JSON.parse(localStorage.getItem('vr.dial.v1')) || {}).claimed; } catch (e) {}
   if (!solved) return;
-  const row = document.querySelector('.tracklist li:nth-child(2)');
-  if (row) row.classList.add('clear');
   const note = document.querySelector('.tracknote');
-  if (note) note.textContent = 'six of them. one of them answers to a name now.';
+  if (note) note.textContent = 'six of them. you already know where the second one lives.';
 })();
 </script>
 <script>
-/* the letter — system form states: error in claret, confirmation in moss, stated once */
+/* the letter — a plain POST to emailoctopus; none of their script on the page, so the form keeps
+   the site's face. a bad address is caught here; a good one leaves for eomail5 and comes back to
+   ?letter=sent, where the confirmation is stated once. */
 (() => {
   const form = document.getElementById('letter-form');
-  const input = form.querySelector('input');
+  const input = form.querySelector('input[type=email]');
   const note = document.getElementById('letter-note');
+  const say = (ok, msg) => { note.className = 'letter-note ' + (ok ? 'ok' : 'err'); note.textContent = msg; };
   form.addEventListener('submit', (e) => {
-    e.preventDefault();
     const ok = input.value.trim() !== '' && input.checkValidity();
     input.setAttribute('aria-invalid', ok ? 'false' : 'true');
     form.classList.toggle('err', !ok);
-    note.className = 'letter-note ' + (ok ? 'ok' : 'err');
-    note.textContent = ok ? "you're on the list. quiet from here."
-                          : "that address doesn't look right.";
-    if (ok) form.reset();
+    if (!ok) { e.preventDefault(); say(false, "that address doesn't look right."); return; }
+    form.querySelector('button').disabled = true;
   });
   input.addEventListener('input', () => {
     form.classList.remove('err');
     if (note.classList.contains('err')) { note.className = 'letter-note'; note.textContent = ''; }
   });
+  if (new URLSearchParams(location.search).get('letter') === 'sent') {
+    say(true, "you're on the list. quiet from here.");
+    history.replaceState(null, '', location.pathname + '#letter');
+  }
 })();
 </script>
 </body>
