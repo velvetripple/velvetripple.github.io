@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>645 — velvet ripple</title>
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#161311">
+<meta property="og:title" content="645">
+<meta property="og:description" content="a window. velvet ripple.">
+<meta property="og:url" content="https://velvetripple.art/645.html">
+<meta property="og:image" content="https://velvetripple.art/assets/og/velvet-ripple-og.png">
+<link rel="icon" href="assets/velvet-ripple-favicon.png">
+<style>
+@font-face{font-family:"Gloock";src:url("fonts/Gloock-Regular.ttf") format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("fonts/GeistMono-VariableFont_wght.ttf") format("truetype");font-weight:100 900;font-display:swap}
+html,body{margin:0;height:100%;background:#0B0A09;color:#EFE7D6;overflow:hidden;font-family:"Geist Mono",ui-monospace,monospace}
+#room{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.02);will-change:transform}
+#glass{position:fixed;inset:0;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
+body[data-ready="no"] #glass{cursor:default}
+.frame{position:fixed;inset:0;pointer-events:none;box-shadow:inset 0 0 0 9px #0B0A09,inset 0 0 140px rgba(0,0,0,.72)}
+#dusk{position:fixed;inset:0;background:#161311;opacity:0;transition:opacity 3.4s ease;pointer-events:none}
+body[data-ended="on"] #dusk{opacity:.7}
+body[data-ended="on"] .hint{opacity:0}
+.namer{position:fixed;display:none;align-items:center;gap:6px;padding:4px 0 2px;border-bottom:1px solid rgba(239,231,214,.35);background:rgba(11,10,9,.6);z-index:5}
+.namer.on{display:flex}
+.namer input{background:none;border:none;outline:none;color:#EFE7D6;font-family:"Geist Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.18em;width:200px;padding:5px 8px}
+.namer input::placeholder{color:rgba(239,231,214,.45);letter-spacing:.18em}
+.namer button{background:none;border:none;color:#D9A24B;font-family:"Geist Mono",ui-monospace,monospace;font-size:13px;cursor:pointer;padding:2px 10px}
+.mono{position:fixed;font-size:11px;letter-spacing:.2em;color:rgba(239,231,214,.55);pointer-events:none;margin:0}
+.home{top:18px;left:20px;pointer-events:auto;text-decoration:none;color:rgba(239,231,214,.6);border-bottom:1px solid rgba(239,231,214,.22);transition:color .4s}
+.home:hover{color:#D9A24B;border-bottom-color:rgba(217,162,75,.5)}
+.stamp{bottom:18px;left:20px}
+.clock{bottom:18px;right:20px;font-variant-numeric:tabular-nums;transition:color .8s}
+.clock.live{color:#D9A24B}
+.hint{top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;letter-spacing:.26em;transition:opacity 1.4s ease;white-space:nowrap}
+body[data-started="yes"] .hint{opacity:0}
+.said{position:fixed;left:8vw;right:8vw;top:50%;transform:translateY(-50%);margin:0;font-family:"Gloock",serif;font-size:clamp(26px,4.6vw,60px);line-height:1.22;color:#EFE7D6;opacity:0;transition:opacity 3.2s ease;pointer-events:none;text-wrap:balance;text-shadow:0 0 28px rgba(11,10,9,.55)}
+.said small{display:block;margin-top:24px;font-family:"Geist Mono",ui-monospace,monospace;font-size:11px;letter-spacing:.22em;color:rgba(239,231,214,.5)}
+.said .go{display:inline-block;margin-top:26px;font-family:"Geist Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.24em;color:#D9A24B;text-decoration:none;border-bottom:1px solid rgba(217,162,75,.45);opacity:0;transition:opacity 1.8s ease .8s;pointer-events:none}
+body[data-ended="on"] .said .go{opacity:1;pointer-events:auto}
+.said .go:hover{color:#EFE7D6;border-bottom-color:rgba(239,231,214,.5)}
+body[data-said="on"] .said{opacity:1}
+@media (prefers-reduced-motion:reduce){#room{transition:none}}
+</style>
+</head>
+<body data-ready="no" data-started="no" data-said="" data-press="" data-ended="">
+<img id="room" src="assets/photos/guitar-desk.png" alt="a lit room seen through a window at night: one lamp, hands on a guitar">
+<canvas id="glass" aria-label="a fogged window. move to wipe it clear; press and hold to leave a handprint, and give it a name if you like; stop, and the fog builds back, muffles the song, and ends it."></canvas>
+<div class="frame" aria-hidden="true"></div>
+<div id="dusk" aria-hidden="true"></div>
+<a class="mono home" href="index.html#forming">&larr; velvet ripple</a>
+<p class="mono hint" id="hint">the room is loading.</p>
+<p class="said" id="said">maybe if i let it blur for a second.<br>i could stop watching and just fall.<small>glass walls · VR — 003</small><a class="go" href="https://ditto.fm/glass-walls-velvet-ripple" target="_blank" rel="noopener">listen &rarr;</a></p>
+<span class="mono stamp">vr — 003</span>
+<span class="mono clock" id="clock"></span>
+<form class="namer" id="namer" autocomplete="off"><input id="namer-in" type="text" maxlength="24" placeholder="a name for the hand" aria-label="a name for the hand"><button type="submit" aria-label="keep the name">&rarr;</button></form>
+<!-- THE PANE'S SETTINGS · edit here; nothing in pane.js needs touching.
+  audio      the file that plays: ONE passage of the song, never the song. wav / m4a / mp3 all work.
+             to change the passage: export that stretch from logic (mono, 32 kHz is plenty) into audio/,
+             set "audio" to its name and "offset" to where it starts in the master, in seconds.
+             or send me the two timestamps and i cut it.
+  offset     where the audio file begins in the master (1:19.607 → 79.607).
+  lyrics     [master seconds, "line"] — written into the fog as the passage reaches them. master time, so
+             you can read it straight off logic; as many or as few lines as you like.
+  lyricIn / lyricHold / lyricFade   seconds to write a line, hold it, and let the fog take it back.
+  regrow     seconds for cleared glass to fog over completely. the fog never stops coming back; as it
+             builds, the song muffles, and when it closes it ends the piece.
+  nameMax    letters allowed in a name on a print. -->
+<script id="pane-config" type="application/json">
+{ "audio": "audio/glass-walls-pane.wav", "offset": 75.0,
+  "lyrics": [[82.06, "i see it all so clearly"], [91.86, "through the glass, through the glass"], [101.65, "every detail sharp and gleaming"], [111.45, "but the sharpness doesn’t let me pass"]],
+  "lyricIn": 1.6, "lyricHold": 6, "lyricFade": 26, "regrow": 55, "nameMax": 24 }
+</script>
+<script src="comms-config.js"></script>
+<script src="pane.js" data-audio="audio/glass-walls-pane.wav"></script>
+</body>
+</html>

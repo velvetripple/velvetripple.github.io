@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Velvet Ripple — Indie Psychedelia from Phoenix, Arizona</title>
-<meta name="description" content="Indie psychedelia from Phoenix, Arizona — analog, nocturnal, tape-first, made for the in-between hour. Debut single Frequency out September 4, 2026.">
+<meta name="description" content="Indie psychedelia from Phoenix, Arizona — analog, nocturnal, tape-first, made for the in-between hour. New single Glass Walls out October 16, 2026.">
 <link rel="canonical" href="https://velvetripple.art/">
 <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1">
 <meta name="theme-color" content="#161311">
@@ -13,14 +13,14 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:url" content="https://velvetripple.art/">
 <meta property="og:title" content="Velvet Ripple — Indie Psychedelia from Phoenix, Arizona">
-<meta property="og:description" content="Analog, nocturnal, tape-first. Music for the in-between hour. Debut single Frequency out September 4, 2026.">
+<meta property="og:description" content="Analog, nocturnal, tape-first. Music for the in-between hour. New single Glass Walls out October 16, 2026.">
 <meta property="og:image" content="https://velvetripple.art/assets/og/velvet-ripple-og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="The Velvet Ripple wordmark in bone on an inkwell ground.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Velvet Ripple — Indie Psychedelia from Phoenix, Arizona">
-<meta name="twitter:description" content="Analog, nocturnal, tape-first. Music for the in-between hour. Debut single Frequency out September 4, 2026.">
+<meta name="twitter:description" content="Analog, nocturnal, tape-first. Music for the in-between hour. New single Glass Walls out October 16, 2026.">
 <meta name="twitter:image" content="https://velvetripple.art/assets/og/velvet-ripple-og.png">
 <meta name="twitter:image:alt" content="The Velvet Ripple wordmark in bone on an inkwell ground.">
 <link rel="me" href="https://instagram.com/velvet.ripple">
@@ -30,7 +30,8 @@
 <link rel="stylesheet" href="colors_and_type.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
-{"@type":"MusicGroup","@id":"https://velvetripple.art/#artist","name":"Velvet Ripple","alternateName":"velvet ripple","url":"https://velvetripple.art/","mainEntityOfPage":"https://velvetripple.art/","description":"Velvet Ripple is a solo indie psychedelia project based in Phoenix, Arizona. Analog and nocturnal — songs written and recorded to tape for the in-between hour. Debut single Frequency arrives September 4, 2026.","disambiguatingDescription":"Indie psychedelia project from Phoenix, Arizona, catalogued VR — 001. Distinct from other recording artists sharing the name Velvet Ripple.","genre":["Indie psychedelia","Psychedelic pop","Experimental pop","Bedroom pop"],"foundingDate":"2026","foundingLocation":{"@type":"Place","name":"Phoenix, Arizona","address":{"@type":"PostalAddress","addressLocality":"Phoenix","addressRegion":"AZ","addressCountry":"US"}},"image":"https://velvetripple.art/assets/og/velvet-ripple-og.png","logo":"https://velvetripple.art/assets/velvet-ripple-mark.svg","sameAs":["https://instagram.com/velvet.ripple","https://www.threads.com/@velvet.ripple"],"track":{"@id":"https://velvetripple.art/#frequency"}},
+{"@type":"MusicGroup","@id":"https://velvetripple.art/#artist","name":"Velvet Ripple","alternateName":"velvet ripple","url":"https://velvetripple.art/","mainEntityOfPage":"https://velvetripple.art/","description":"Velvet Ripple is a solo indie psychedelia project based in Phoenix, Arizona. Analog and nocturnal — songs written and recorded to tape for the in-between hour. Debut single Frequency released September 4, 2026; second single Glass Walls out October 16, 2026.","disambiguatingDescription":"Indie psychedelia project from Phoenix, Arizona, catalogued VR — 001. Distinct from other recording artists sharing the name Velvet Ripple.","genre":["Indie psychedelia","Psychedelic pop","Experimental pop","Bedroom pop"],"foundingDate":"2026","foundingLocation":{"@type":"Place","name":"Phoenix, Arizona","address":{"@type":"PostalAddress","addressLocality":"Phoenix","addressRegion":"AZ","addressCountry":"US"}},"image":"https://velvetripple.art/assets/og/velvet-ripple-og.png","logo":"https://velvetripple.art/assets/velvet-ripple-mark.svg","sameAs":["https://instagram.com/velvet.ripple","https://www.threads.com/@velvet.ripple"],"track":[{"@id":"https://velvetripple.art/#glass-walls"},{"@id":"https://velvetripple.art/#frequency"}]},
+{"@type":"MusicRecording","@id":"https://velvetripple.art/#glass-walls","name":"Glass Walls","byArtist":{"@id":"https://velvetripple.art/#artist"},"datePublished":"2026-10-16","duration":"PT6M34S","inLanguage":"en","genre":["Indie psychedelia","Dream pop"],"description":"Second single from Velvet Ripple. Slow-burning dream pop, 98 BPM, recorded in Phoenix, Arizona."},
 {"@type":"MusicRecording","@id":"https://velvetripple.art/#frequency","name":"Frequency","byArtist":{"@id":"https://velvetripple.art/#artist"},"datePublished":"2026-09-04","duration":"PT3M36S","inLanguage":"en","genre":"Indie psychedelia","description":"Debut single from Velvet Ripple. Nocturnal indie synth-pop, 108 BPM, recorded in Phoenix, Arizona."},
 {"@type":"WebSite","@id":"https://velvetripple.art/#website","url":"https://velvetripple.art/","name":"Velvet Ripple","inLanguage":"en","publisher":{"@id":"https://velvetripple.art/#artist"}}]}
 </script>
@@ -293,6 +294,10 @@
   body[data-climate] .forming-art img{ filter:none; }
   /* the cover prints its own title bottom-left, so the rebate moves to the top edge */
   .forming-art .rebate{ top:6px; bottom:auto; }
+  /* the cover is the door to 645: it fogs over on hover, the way the pane does, and opens on click */
+  .pane-door{ position:absolute; inset:0; display:block; }
+  .pane-door img{ transition:filter 1.4s ease; }
+  .forming-art:hover .pane-door img, body[data-climate] .forming-art:hover .pane-door img{ filter:blur(7px) saturate(.85); }
 
   /* tracklist — present, six rows, none of it legible yet. the rows carry word LENGTHS
      only: no titles exist in the markup, so there is nothing to read in the source either. */
@@ -310,13 +315,17 @@
   .tracklist li:nth-child(5) .smear{ translate:-1px 1px; opacity:.7; }
   .tracklist li:nth-child(6) .smear{ translate:3px 0; opacity:.62; }
   .tracklist .smear{ display:flex; align-items:baseline; gap:7px; flex:1; filter:url(#vr-melt) blur(2.9px); }
-  /* the second track has a name now — it develops as the list comes into view; the rest stay on the shelf */
+  /* two tracks are out and a third is named — they develop as the list comes into view; the rest stay on the shelf */
   .tracklist .tt{ display:none; }
   .tracklist li.clear .smear{ display:none; }
   .tracklist li.clear .tt{ display:inline; color:var(--vr-honey); opacity:1;
        text-transform:none; font-size:.8rem; letter-spacing:.16em; }
   .tracklist.in li.clear .tt{ animation:trackDevelop 2.6s ease both .5s; }
   .tracklist li.clear .tn{ opacity:.85; }
+  /* named but not out: legible in the list's own ink, no honey yet */
+  .tracklist li.named .smear{ display:none; }
+  .tracklist li.named .tt{ display:inline; opacity:1; text-transform:none; font-size:.8rem; letter-spacing:.16em; }
+  .tracklist li.named .tn{ opacity:.7; }
   @keyframes trackDevelop{ from{ filter:blur(7px); opacity:0; }
        60%{ filter:blur(1.2px); opacity:.7; } to{ filter:blur(0); opacity:1; } }
   .tracknote{ display:block; margin-top:14px; max-width:32ch; text-transform:none;
@@ -483,7 +492,7 @@
 <section class="hero lit" id="top" data-climate="bone" data-screen-label="hero">
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
   <div class="rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-  <span class="mono">vr — 002 · indie psychedelia · arizona</span>
+  <span class="mono">vr — 003 · indie psychedelia · arizona</span>
   <h1 class="hero-word velvet-word misreg">velvet<br>ripple</h1>
   <p class="hero-sub">the in-between hour, recorded.</p>
   <div class="hero-strip film" data-plx="22">
@@ -491,7 +500,7 @@
     <span class="rebate">vr–400 ▸ leader</span>
   </div>
   <div class="hero-cue" aria-hidden="true">
-    <svg class="cue-ring" viewBox="0 0 100 100"><defs><path id="cue-o" d="M50,50 m-39,0 a39,39 0 1,1 78,0 a39,39 0 1,1 -78,0"></path></defs><text><textPath href="#cue-o">slow · velvet ripple · vr — 002 ·&#160;</textPath></text></svg>
+    <svg class="cue-ring" viewBox="0 0 100 100"><defs><path id="cue-o" d="M50,50 m-39,0 a39,39 0 1,1 78,0 a39,39 0 1,1 -78,0"></path></defs><text><textPath href="#cue-o">slow · velvet ripple · vr — 003 ·&#160;</textPath></text></svg>
     <span class="cue-arrow">↓</span>
   </div>
 </section>
@@ -506,31 +515,31 @@
 <section class="forming lit" id="forming" data-climate="teal" data-screen-label="the single">
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
   <div class="forming-art rv film" data-plx="16">
-    <img src="assets/photos/frequency-cover-1200.jpg" alt="Frequency — single cover art: a crowd dissolved into pink, blue and orange light">
-    <span class="rebate">vr–400 ▸ 02</span>
+    <a class="pane-door" href="645.html" aria-label="the window — 645"><img src="assets/photos/glass-walls-cover-1200.jpg" alt="Glass Walls — single cover art: blurred figures seen through a pane of glass, navy light, a magenta haze, an orange glow low in the frame"></a>
+    <span class="rebate">vr–400 ▸ 03</span>
   </div>
   <div class="forming-copy">
-    <span class="mono rv">vr — 002 · the single</span>
-    <h2 class="forming-title rv misreg warp">frequency.</h2>
-    <p class="forming-it rv">the second of six. september 4, 2026.</p>
-    <p class="forming-body rv">you can&rsquo;t see the towers from the highway. only the lights &mdash; each on its own timing, never together. that&rsquo;s the song.</p>
-    <a class="listen rv" id="listen" href="https://ditto.fm/frequency-velvet-ripple" target="_blank" rel="noopener" data-live="2026-09-04T17:00:00Z"><span class="listen-t">pre-save</span><span class="ar">&rarr;</span></a>
+    <span class="mono rv">vr — 003 · the single</span>
+    <h2 class="forming-title rv misreg warp">glass walls.</h2>
+    <p class="forming-it rv">track one. october 16, 2026.</p>
+    <p class="forming-body rv">from outside a lit window you can see all of it &mdash; the lamp, the hands, the whole conversation. just not a way in. that&rsquo;s the song.</p>
+    <a class="listen rv" id="listen" href="https://ditto.fm/glass-walls-velvet-ripple" target="_blank" rel="noopener" data-live="2026-10-17T01:45:00Z"><span class="listen-t">pre-save</span><span class="ar">&rarr;</span></a>
     <div class="forming-meta rv">
-      <span class="mono">3:36</span>
+      <span class="mono">6:33</span>
       <span class="mono">·</span>
-      <span class="mono">108 bpm</span>
+      <span class="mono">98 bpm</span>
       <span class="mono">·</span>
-      <span class="mono">tape</span>
+      <span class="mono">phoenix</span>
     </div>
-    <ol class="tracklist rv" aria-label="six tracks, one of them named">
-      <li><span class="tn mono">01</span><span class="smear"><span class="tw" style="--w:26%"></span><span class="tw" style="--w:14%"></span><span class="tw" style="--w:31%"></span></span></li>
+    <ol class="tracklist rv" aria-label="six tracks, three of them named">
+      <li class="clear"><span class="tn mono">01</span><span class="smear"><span class="tw" style="--w:26%"></span><span class="tw" style="--w:14%"></span><span class="tw" style="--w:31%"></span></span><span class="tt mono">glass walls</span></li>
       <li class="clear"><span class="tn mono">02</span><span class="smear"><span class="tw" style="--w:19%"></span><span class="tw" style="--w:38%"></span></span><span class="tt mono">frequency</span></li>
-      <li><span class="tn mono">03</span><span class="smear"><span class="tw" style="--w:12%"></span><span class="tw" style="--w:22%"></span><span class="tw" style="--w:16%"></span><span class="tw" style="--w:24%"></span></span></li>
+      <li class="named"><span class="tn mono">03</span><span class="smear"><span class="tw" style="--w:12%"></span><span class="tw" style="--w:22%"></span><span class="tw" style="--w:16%"></span><span class="tw" style="--w:24%"></span></span><span class="tt mono">little world / rooms i&rsquo;ve left</span></li>
       <li><span class="tn mono">04</span><span class="smear"><span class="tw" style="--w:33%"></span><span class="tw" style="--w:17%"></span></span></li>
       <li><span class="tn mono">05</span><span class="smear"><span class="tw" style="--w:15%"></span><span class="tw" style="--w:27%"></span><span class="tw" style="--w:13%"></span></span></li>
       <li><span class="tn mono">06</span><span class="smear"><span class="tw" style="--w:21%"></span><span class="tw" style="--w:11%"></span><span class="tw" style="--w:29%"></span></span></li>
     </ol>
-    <span class="mono rv tracknote">six of them. the second one has a name.</span>
+    <span class="mono rv tracknote">six of them. three have names now.</span>
     <a class="mono rv forming-link tunein" href="108.html"><span class="tune-static" aria-hidden="true"></span><span class="tune-t">tune in to 108.0</span><span class="tune-ar">&rarr;</span></a>
   </div>
 </section>
@@ -565,8 +574,8 @@
   <div class="oil" aria-hidden="true"><i class="o1"></i><i class="o2"></i><i class="o3"></i><i class="o4"></i></div>
   <div class="rings" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
   <span class="mono rv">the word</span>
-  <p class="word-lyric rv velvet-word misreg">almost is where<br>i&rsquo;ve always been.</p>
-  <span class="mono rv">vr — 002</span>
+  <p class="word-lyric rv velvet-word misreg">the clearer it gets,<br>the further away i feel.</p>
+  <span class="mono rv">vr — 003</span>
 </section>
 
 <!-- 6 · THE LETTER -->
@@ -587,20 +596,26 @@
 
 <footer data-climate="ink">
   <span class="nav-mark">velvet ripple</span>
+  <span class="mono"><a href="https://ditto.fm/glass-walls-velvet-ripple" target="_blank" rel="noopener" data-listen-mirror>listen — glass walls</a></span>
   <span class="mono"><a href="https://ditto.fm/frequency-velvet-ripple" target="_blank" rel="noopener">listen — frequency</a></span>
   <span class="mono"><a href="https://instagram.com/velvet.ripple" target="_blank" rel="noopener">instagram — @velvet.ripple</a></span>
   <span class="mono"><a href="https://www.threads.com/@velvet.ripple" target="_blank" rel="noopener">threads — @velvet.ripple</a></span>
-  <span class="mono right">vr — 002 · mmxxvi</span>
+  <span class="mono"><a href="645.html">645</a></span>
+  <span class="mono right">vr — 003 · mmxxvi</span>
 </footer>
 
 
 <script src="liquid-scroll.js"></script>
 <script>
-/* the button tells the truth about the date — pre-save until 10:00 phoenix on sept 4, listen after.
-   the smartlink itself flips on its own; this just keeps the label honest without a redeploy. */
+/* the button tells the truth about the date — pre-save until 6:45 pm phoenix on oct 16, listen after.
+   the smartlink itself flips on its own; this just keeps the label honest without a redeploy.
+   the footer's listen link mirrors this one, so the url lives in exactly one place. */
 (() => {
   const a = document.getElementById('listen');
-  if (a && Date.now() >= Date.parse(a.dataset.live)) a.querySelector('.listen-t').textContent = 'listen';
+  if (!a) return;
+  if (Date.now() >= Date.parse(a.dataset.live)) a.querySelector('.listen-t').textContent = 'listen';
+  const m = document.querySelector('[data-listen-mirror]');
+  if (m) m.href = a.href;
 })();
 /* the room and the site share one origin, so the site can tell whether 108.0 has been found.
    the track is public now, so the row is legible for everyone — solvers get one quieter line. */
@@ -609,7 +624,7 @@
   try { solved = !!(JSON.parse(localStorage.getItem('vr.dial.v1')) || {}).claimed; } catch (e) {}
   if (!solved) return;
   const note = document.querySelector('.tracknote');
-  if (note) note.textContent = 'six of them. you already know where the second one lives.';
+  if (note) note.textContent = 'six of them. three have names now. you already know where the second one lives.';
 })();
 </script>
 <script>
