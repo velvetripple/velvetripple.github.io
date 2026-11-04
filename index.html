@@ -30,9 +30,9 @@
 <link rel="stylesheet" href="colors_and_type.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@graph":[
-{"@type":"MusicGroup","@id":"https://velvetripple.art/#artist","name":"Velvet Ripple","alternateName":"velvet ripple","url":"https://velvetripple.art/","mainEntityOfPage":"https://velvetripple.art/","description":"Velvet Ripple is a solo indie psychedelia project based in Phoenix, Arizona. Analog and nocturnal — songs written and recorded to tape for the in-between hour. Debut single Frequency released September 4, 2026; second single Glass Walls out October 16, 2026.","disambiguatingDescription":"Indie psychedelia project from Phoenix, Arizona, catalogued VR — 001. Distinct from other recording artists sharing the name Velvet Ripple.","genre":["Indie psychedelia","Psychedelic pop","Experimental pop","Bedroom pop"],"foundingDate":"2026","foundingLocation":{"@type":"Place","name":"Phoenix, Arizona","address":{"@type":"PostalAddress","addressLocality":"Phoenix","addressRegion":"AZ","addressCountry":"US"}},"image":"https://velvetripple.art/assets/og/velvet-ripple-og.png","logo":"https://velvetripple.art/assets/velvet-ripple-mark.svg","sameAs":["https://instagram.com/velvet.ripple","https://www.threads.com/@velvet.ripple"],"track":[{"@id":"https://velvetripple.art/#glass-walls"},{"@id":"https://velvetripple.art/#frequency"}]},
-{"@type":"MusicRecording","@id":"https://velvetripple.art/#glass-walls","name":"Glass Walls","byArtist":{"@id":"https://velvetripple.art/#artist"},"datePublished":"2026-10-16","duration":"PT6M34S","inLanguage":"en","genre":["Indie psychedelia","Dream pop"],"description":"Second single from Velvet Ripple. Slow-burning dream pop, 98 BPM, recorded in Phoenix, Arizona."},
-{"@type":"MusicRecording","@id":"https://velvetripple.art/#frequency","name":"Frequency","byArtist":{"@id":"https://velvetripple.art/#artist"},"datePublished":"2026-09-04","duration":"PT3M36S","inLanguage":"en","genre":"Indie psychedelia","description":"Debut single from Velvet Ripple. Nocturnal indie synth-pop, 108 BPM, recorded in Phoenix, Arizona."},
+{"@type":"MusicGroup","@id":"https://velvetripple.art/#artist","name":"Velvet Ripple","alternateName":"velvet ripple","url":"https://velvetripple.art/","mainEntityOfPage":"https://velvetripple.art/","description":"Velvet Ripple is a solo indie psychedelia project based in Phoenix, Arizona. Analog and nocturnal — songs written and recorded to tape for the in-between hour. Debut single Frequency released September 4, 2026; second single Glass Walls out October 16, 2026.","disambiguatingDescription":"Indie psychedelia project from Phoenix, Arizona, catalogued VR — 001. Distinct from other recording artists sharing the name Velvet Ripple.","genre":["Indie psychedelia","Psychedelic pop","Experimental pop","Bedroom pop"],"foundingDate":"2026","foundingLocation":{"@type":"Place","name":"Phoenix, Arizona","address":{"@type":"PostalAddress","addressLocality":"Phoenix","addressRegion":"AZ","addressCountry":"US"}},"image":"https://velvetripple.art/assets/og/velvet-ripple-og.png","logo":"https://velvetripple.art/assets/velvet-ripple-mark.svg","email":"vrish@asu.edu","sameAs":["https://instagram.com/velvet.ripple","https://www.threads.com/@velvet.ripple","https://open.spotify.com/artist/0RsDPd4YAbItk7TRinifoD","https://music.apple.com/us/artist/velvet-ripple/6805790493"],"track":[{"@id":"https://velvetripple.art/#glass-walls"},{"@id":"https://velvetripple.art/#frequency"}]},
+{"@type":"MusicRecording","@id":"https://velvetripple.art/#glass-walls","name":"Glass Walls","byArtist":{"@id":"https://velvetripple.art/#artist"},"datePublished":"2026-10-16","duration":"PT6M34S","inLanguage":"en","genre":["Indie psychedelia","Dream pop"],"description":"Second single from Velvet Ripple. Slow-burning dream pop, 98 BPM, recorded in Phoenix, Arizona.","sameAs":["https://open.spotify.com/track/2inmdB5BI77fAMbQbGTOsR"]},
+{"@type":"MusicRecording","@id":"https://velvetripple.art/#frequency","name":"Frequency","byArtist":{"@id":"https://velvetripple.art/#artist"},"datePublished":"2026-09-04","duration":"PT3M36S","inLanguage":"en","genre":"Indie psychedelia","description":"Debut single from Velvet Ripple. Nocturnal indie synth-pop, 108 BPM, recorded in Phoenix, Arizona.","sameAs":["https://open.spotify.com/track/4k4px5YEAr4J5agiA6WUmD","https://music.apple.com/us/album/frequency/6804748614?i=6804748625"]},
 {"@type":"WebSite","@id":"https://velvetripple.art/#website","url":"https://velvetripple.art/","name":"Velvet Ripple","inLanguage":"en","publisher":{"@id":"https://velvetripple.art/#artist"}}]}
 </script>
 <style>
@@ -375,6 +375,11 @@
        transition:background var(--dur-hover,.5s) ease, border-color var(--dur-hover,.5s) ease, gap var(--dur-hover,.5s) ease; }
   .listen:hover{ background:#E4B15F; border-color:#E4B15F; gap:20px; }
   .listen .ar{ opacity:.7; }
+  /* the direct doors — spotify and apple by name; the plate stays the one honey thing */
+  .listen-direct{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-top:10px; }
+  .listen-direct a{ color:var(--pfg2); border-bottom:1px solid transparent; padding-bottom:2px;
+       transition:color var(--dur-hover,.5s) ease, border-color var(--dur-hover,.5s) ease; }
+  .listen-direct a:hover{ color:var(--vr-honey); border-bottom-color:var(--vr-honey); }
   .forming-meta{ display:flex; gap:14px; flex-wrap:wrap; margin-top:8px; }
   /* the one door to the frequency room — never explained */
   .forming-link{ align-self:flex-start; margin-top:16px; letter-spacing:.24em;
@@ -414,7 +419,8 @@
        margin-top:14px; transition:border-color var(--dur-hover,400ms) ease; }
   .letter-form:focus-within{ border-bottom-color:var(--vr-honey); }
   .letter-form.err{ border-bottom-color:var(--error-on-deep,#D99A93); }
-  .letter-form input{ flex:1; background:none; border:none; outline:none; color:var(--pfg);
+  .letter-form input{ flex:1; min-width:0; width:100%; background:none; border:none; outline:none; color:var(--pfg);
+       -webkit-appearance:none; appearance:none; border-radius:0; box-shadow:none;
        font-family:var(--font-body); font-size:1.02rem; padding:12px 2px; }
   .letter-form input::placeholder{ color:var(--pfg3); }
   .letter-form .hp{ position:absolute; left:-5000px; width:1px; height:1px; opacity:0; } /* honeypot — people never see it, bots fill it */
@@ -445,6 +451,16 @@
 
   @media (max-width: 900px){
     nav{ padding:18px 22px; gap:16px; }
+    /* on a phone the bare rule reads as a line, not a field — give the address somewhere to go */
+    .letter-form{ width:min(440px,100%); border:1px solid var(--pfg2); border-radius:2px;
+         padding:0 8px 0 14px; align-items:center; }
+    .letter-form:focus-within{ border-color:var(--vr-honey); }
+    .letter-form.err{ border-color:var(--error-on-deep,#D99A93); }
+    .letter-form.sent{ border-color:var(--ok-on-deep,#A9BD97); }
+    .letter-form input{ font-size:16px; padding:14px 0; }
+    .letter-form input::placeholder{ color:var(--pfg2); }
+    .letter-form button{ padding:14px 6px; }
+    .letter{ padding:100px 22px 60px; }
     .forming{ grid-template-columns:1fr; gap:40px; padding:100px 24px; }
     .field{ padding:100px 24px 110px; }
     .field-grid{ grid-template-columns:1fr; gap:56px; }
@@ -523,7 +539,12 @@
     <h2 class="forming-title rv misreg warp">glass walls.</h2>
     <p class="forming-it rv">track one. october 16, 2026.</p>
     <p class="forming-body rv">from outside a lit window you can see all of it &mdash; the lamp, the hands, the whole conversation. just not a way in. that&rsquo;s the song.</p>
-    <a class="listen rv" id="listen" href="https://ditto.fm/glass-walls-velvet-ripple" target="_blank" rel="noopener" data-live="2026-10-17T01:45:00Z"><span class="listen-t">pre-save</span><span class="ar">&rarr;</span></a>
+    <a class="listen rv" id="listen" href="https://ditto.fm/glass-walls-velvet-ripple" target="_blank" rel="noopener"><span class="listen-t">listen</span><span class="ar">&rarr;</span></a>
+    <div class="listen-direct rv" aria-label="listen on">
+      <a class="mono" href="https://open.spotify.com/track/2inmdB5BI77fAMbQbGTOsR" target="_blank" rel="noopener">spotify</a>
+      <span class="mono">·</span>
+      <a class="mono" href="https://ditto.fm/glass-walls-velvet-ripple" target="_blank" rel="noopener">all platforms</a>
+    </div>
     <div class="forming-meta rv">
       <span class="mono">6:33</span>
       <span class="mono">·</span>
@@ -584,7 +605,7 @@
   <hr class="ripple-rule" aria-hidden="true">
   <h2 class="letter-title rv misreg warp">the letter</h2>
   <p class="letter-copy rv">a note when there is something true to say. observations, not announcements.</p>
-  <form class="letter-form rv" id="letter-form" method="post" action="https://eomail5.com/form/a2d98e58-8abf-11f1-98b9-2bc8e1536409" novalidate>
+  <form class="letter-form" id="letter-form" method="post" action="https://eomail5.com/form/a2d98e58-8abf-11f1-98b9-2bc8e1536409" novalidate>
     <input type="email" name="field_0" id="field_0" placeholder="your address" aria-label="email address" autocomplete="email" required>
     <input type="text" name="hpa2d98e58-8abf-11f1-98b9-2bc8e1536409" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
     <input type="hidden" name="successRedirectUrl" value="https://velvetripple.art/?letter=sent#letter">
@@ -598,22 +619,23 @@
   <span class="nav-mark">velvet ripple</span>
   <span class="mono"><a href="https://ditto.fm/glass-walls-velvet-ripple" target="_blank" rel="noopener" data-listen-mirror>listen — glass walls</a></span>
   <span class="mono"><a href="https://ditto.fm/frequency-velvet-ripple" target="_blank" rel="noopener">listen — frequency</a></span>
+  <span class="mono"><a href="https://open.spotify.com/artist/0RsDPd4YAbItk7TRinifoD" target="_blank" rel="noopener">spotify</a></span>
+  <span class="mono"><a href="https://music.apple.com/us/artist/velvet-ripple/6805790493" target="_blank" rel="noopener">apple music</a></span>
   <span class="mono"><a href="https://instagram.com/velvet.ripple" target="_blank" rel="noopener">instagram — @velvet.ripple</a></span>
   <span class="mono"><a href="https://www.threads.com/@velvet.ripple" target="_blank" rel="noopener">threads — @velvet.ripple</a></span>
   <span class="mono"><a href="645.html">645</a></span>
+  <span class="mono"><a href="mailto:vrish@asu.edu">contact — vrish@asu.edu</a></span>
   <span class="mono right">vr — 003 · mmxxvi</span>
 </footer>
 
 
 <script src="liquid-scroll.js"></script>
 <script>
-/* the button tells the truth about the date — pre-save until 6:45 pm phoenix on oct 16, listen after.
-   the smartlink itself flips on its own; this just keeps the label honest without a redeploy.
+/* glass walls is out (oct 16, 2026) — the plate reads listen, no date gate left.
    the footer's listen link mirrors this one, so the url lives in exactly one place. */
 (() => {
   const a = document.getElementById('listen');
   if (!a) return;
-  if (Date.now() >= Date.parse(a.dataset.live)) a.querySelector('.listen-t').textContent = 'listen';
   const m = document.querySelector('[data-listen-mirror]');
   if (m) m.href = a.href;
 })();
